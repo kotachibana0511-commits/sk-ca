@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Skeepon Fertigation Calculator</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #f0f4f0;
+      color: #1a2e1a;
+      min-height: 100vh;
+      padding: 32px 16px;
+    }
+
+    .container {
+      max-width: 680px;
+      margin: 0 auto;
+    }
+
+    header {
+      margin-bottom: 28px;
+    }
+
+    header h1 {
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: #1a4d1a;
+    }
+
+    header p {
+      margin-top: 6px;
+      color: #4a6e4a;
+      font-size: 0.92rem;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 20px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    }
+
+    .card h2 {
+      font-size: 0.78rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #4a6e4a;
+      margin-bottom: 18px;
+    }
+
+    /* ── Hero inputs ── */
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .hero-field {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .hero-field label {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: #2e7d32;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .hero-wrap {
+      display: flex;
+      align-items: baseline;
+      border: 2px solid #2e7d32;
+      border-radius: 10px;
+      overflow: hidden;
+      background: #f4faf4;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+
+    .hero-wrap:focus-within {
+      box-shadow: 0 0 0 3px rgba(46,125,50,0.15);
+    }
+
+    .hero-wrap input {
+      flex: 1;
+      border: none;
+      outline: none;
+      padding: 14px 12px;
+      font-size: 2rem;
+      font-weight: 700;
+      font-family: inherit;
+      color: #1a4d1a;
+      background: transparent;
+      width: 0;
+    }
+
+    .hero-wrap .unit {
+      padding: 14px 14px 14px 4px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: #4a6e4a;
+      white-space: nowrap;
+    }
+
+    /* ── System params (secondary) ── */
+    details {
+      margin-top: 4px;
+    }
+
+    details summary {
+      cursor: pointer;
+      font-size: 0.82rem;
+      color: #4a6e4a;
+      font-weight: 500;
+      list-style: none;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      user-select: none;
+    }
+
+    details summary::before {
+      content: "▶";
+      font-size: 0.65rem;
+      transition: transform 0.2s;
+    }
+
+    details[open] summary::before {
+      transform: rotate(90deg);
+    }
+
+    .param-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    .param-field {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .param-field label {
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: #5a7a5a;
+    }
+
+    .param-wrap {
+      display: flex;
+      align-items: center;
+      border: 1.5px solid #c8dcc8;
+      border-radius: 8px;
+      overflow: hidden;
+      transition: border-color 0.15s;
+    }
+
+    .param-wrap:focus-within {
+      border-color: #2e7d32;
+    }
+
+    .param-wrap input {
+      flex: 1;
+      border: none;
+      outline: none;
+      padding: 7px 10px;
+      font-size: 0.92rem;
+      font-family: inherit;
+      color: #1a2e1a;
+      background: transparent;
+      width: 0;
+    }
+
+    .param-wrap .unit {
+      padding: 7px 8px 7px 2px;
+      font-size: 0.72rem;
+      color: #6a8e6a;
+      white-space: nowrap;
+    }
+
+    /* ── Results ── */
+    .result-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .result-item {
+      background: #f4faf4;
+      border: 1.5px solid #c8dcc8;
+      border-radius: 10px;
+      padding: 14px 16px;
+    }
+
+    .result-item.highlight {
+      background: #e8f5e9;
+      border-color: #2e7d32;
+    }
+
+    .result-item .label {
+      font-size: 0.78rem;
+      color: #4a6e4a;
+      margin-bottom: 4px;
+    }
+
+    .result-item .value {
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: #1a4d1a;
+    }
+
+    .result-item .value .small {
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: #4a6e4a;
+      margin-left: 3px;
+    }
+
+    /* ── Tank bar ── */
+    .tank-bar {
+      height: 28px;
+      border-radius: 6px;
+      overflow: hidden;
+      display: flex;
+      margin: 18px 0 10px;
+    }
+
+    .tank-bar .seg-skeepon {
+      background: #2e7d32;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 0.72rem;
+      font-weight: 600;
+      transition: width 0.3s;
+      white-space: nowrap;
+      overflow: hidden;
+    }
+
+    .tank-bar .seg-water {
+      background: #81c784;
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #1a4d1a;
+      font-size: 0.72rem;
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+    }
+
+    .legend {
+      display: flex;
+      gap: 18px;
+      font-size: 0.78rem;
+      color: #4a6e4a;
+    }
+
+    .legend span {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .legend .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 2px;
+    }
+
+    .note {
+      font-size: 0.78rem;
+      color: #5a7a5a;
+      margin-top: 14px;
+      line-height: 1.5;
+    }
+
+    /* ── Scenario table ── */
+    .flow-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.88rem;
+    }
+
+    .flow-table th {
+      text-align: right;
+      padding: 8px 12px;
+      background: #f0f8f0;
+      color: #3a5a3a;
+      font-weight: 600;
+      font-size: 0.78rem;
+      border-bottom: 2px solid #c8dcc8;
+    }
+
+    .flow-table th:first-child,
+    .flow-table td:first-child {
+      text-align: left;
+    }
+
+    .flow-table td {
+      padding: 9px 12px;
+      border-bottom: 1px solid #e8f0e8;
+      color: #1a2e1a;
+      text-align: right;
+    }
+
+    .flow-table tr:last-child td { border-bottom: none; }
+
+    .flow-table tr.active td {
+      background: #e8f5e9;
+      font-weight: 600;
+      color: #1a4d1a;
+    }
+
+    .flow-table tr:hover td { background: #f4faf4; cursor: pointer; }
+    .flow-table tr.active:hover td { background: #e8f5e9; }
+
+    @media (max-width: 480px) {
+      .hero-grid, .result-grid { grid-template-columns: 1fr; }
+      .param-grid { grid-template-columns: 1fr 1fr; }
+      .hero-wrap input { font-size: 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <header>
+    <h1>Skeepon Fertigation Calculator</h1>
+    <p>California irrigation — stock tank mix for consistent field delivery</p>
+  </header>
+
+  <!-- Primary variable inputs -->
+  <div class="card">
+    <h2>Variable Inputs</h2>
+    <div class="hero-grid">
+      <div class="hero-field">
+        <label>Acreage</label>
+        <div class="hero-wrap">
+          <input type="number" id="acres" value="20" min="0.1" step="1">
+          <span class="unit">acres</span>
+        </div>
+      </div>
+      <div class="hero-field">
+        <label>Flow Rate</label>
+        <div class="hero-wrap">
+          <input type="number" id="flowRate" value="250" min="1" step="50">
+          <span class="unit">gpm</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- System parameters collapsed by default -->
+    <details style="margin-top:20px;">
+      <summary>System parameters</summary>
+      <div class="param-grid">
+        <div class="param-field">
+          <label>Application rate</label>
+          <div class="param-wrap">
+            <input type="number" id="appRate" value="1" min="0.01" step="0.1">
+            <span class="unit">gal/acre</span>
+          </div>
+        </div>
+        <div class="param-field">
+          <label>Injector pump</label>
+          <div class="param-wrap">
+            <input type="number" id="injRate" value="20" min="0.1" step="1">
+            <span class="unit">gpm</span>
+          </div>
+        </div>
+        <div class="param-field">
+          <label>Dilution (1 : X)</label>
+          <div class="param-wrap">
+            <input type="number" id="dilution" value="250" min="1" step="1">
+            <span class="unit">ratio</span>
+          </div>
+        </div>
+      </div>
+    </details>
+  </div>
+
+  <!-- Results -->
+  <div class="card">
+    <h2>Tank Mix</h2>
+    <div class="result-grid">
+      <div class="result-item highlight">
+        <div class="label">Skeepon to add</div>
+        <div class="value" id="out-skeepon">—<span class="small">gal</span></div>
+      </div>
+      <div class="result-item highlight">
+        <div class="label">Water / Fertilizer to add</div>
+        <div class="value" id="out-water">—<span class="small">gal</span></div>
+      </div>
+      <div class="result-item">
+        <div class="label">Total tank volume</div>
+        <div class="value" id="out-tank">—<span class="small">gal</span></div>
+      </div>
+      <div class="result-item">
+        <div class="label">Injection run time</div>
+        <div class="value" id="out-time">—<span class="small">min</span></div>
+      </div>
+    </div>
+
+    <div class="tank-bar">
+      <div class="seg-skeepon" id="bar-skeepon" style="width:5%">Skeepon</div>
+      <div class="seg-water" id="bar-water">Water / Fertilizer</div>
+    </div>
+    <div class="legend">
+      <span><span class="dot" style="background:#2e7d32"></span>Skeepon</span>
+      <span><span class="dot" style="background:#81c784"></span>Water / Fertilizer</span>
+    </div>
+
+    <p class="note" id="verify-note"></p>
+  </div>
+
+  <!-- Flow rate scenario table (acreage fixed, flow varies) -->
+  <div class="card">
+    <h2>Flow Rate Scenarios — <span id="table-acres-label">20</span> acres</h2>
+    <table class="flow-table">
+      <thead>
+        <tr>
+          <th>Flow (gpm)</th>
+          <th>Skeepon (gal)</th>
+          <th>Water (gal)</th>
+          <th>Tank total (gal)</th>
+          <th>Run time (min)</th>
+        </tr>
+      </thead>
+      <tbody id="flow-tbody"></tbody>
+    </table>
+    <p class="note">Click any row to set that flow rate above.</p>
+  </div>
+
+</div>
+
+<script>
+  const FLOW_SCENARIOS = [100, 150, 200, 250, 300, 400, 500, 600, 800, 1000];
+
+  function calculate() {
+    const acres    = parseFloat(document.getElementById('acres').value)    || 0;
+    const flowRate = parseFloat(document.getElementById('flowRate').value) || 0;
+    const appRate  = parseFloat(document.getElementById('appRate').value)  || 1;
+    const injRate  = parseFloat(document.getElementById('injRate').value)  || 20;
+    const dilution = parseFloat(document.getElementById('dilution').value) || 250;
+
+    if (!acres || !flowRate) return;
+
+    const skeepon = acres * appRate;
+    const tankVol = skeepon * dilution * injRate / flowRate;
+    const water   = tankVol - skeepon;
+    const runTime = tankVol / injRate;
+    const skeePct = (skeepon / tankVol) * 100;
+
+    document.getElementById('out-skeepon').innerHTML = fmt(skeepon) + '<span class="small"> gal</span>';
+    document.getElementById('out-water').innerHTML   = fmt(water)   + '<span class="small"> gal</span>';
+    document.getElementById('out-tank').innerHTML    = fmt(tankVol) + '<span class="small"> gal</span>';
+    document.getElementById('out-time').innerHTML    = fmt(runTime) + '<span class="small"> min</span>';
+
+    const barPct = Math.max(2, Math.min(skeePct, 98));
+    document.getElementById('bar-skeepon').style.width = barPct + '%';
+    document.getElementById('bar-skeepon').textContent = skeePct < 6 ? '' : 'Skeepon';
+
+    const fieldConc = (skeepon / tankVol) * (injRate / flowRate);
+    document.getElementById('verify-note').textContent =
+      `Stock: ${fmt(skeePct, 1)}% Skeepon · Injecting ${fmt(injRate)} gpm into ${fmt(flowRate)} gpm mainline → 1:${Math.round(1/fieldConc)} field dilution`;
+
+    document.getElementById('table-acres-label').textContent = acres;
+    renderTable(acres, appRate, injRate, dilution, flowRate);
+  }
+
+  function renderTable(acres, appRate, injRate, dilution, activeFlow) {
+    const skeepon = acres * appRate;
+    const tbody   = document.getElementById('flow-tbody');
+    tbody.innerHTML = '';
+
+    FLOW_SCENARIOS.forEach(flow => {
+      const tank    = skeepon * dilution * injRate / flow;
+      const water   = tank - skeepon;
+      const runTime = tank / injRate;
+      const isActive = Math.abs(flow - activeFlow) < 1;
+
+      const tr = document.createElement('tr');
+      if (isActive) tr.classList.add('active');
+      tr.innerHTML = `
+        <td>${flow}</td>
+        <td>${fmt(skeepon)}</td>
+        <td>${fmt(water)}</td>
+        <td>${fmt(tank)}</td>
+        <td>${fmt(runTime)}</td>
+      `;
+      tr.addEventListener('click', () => {
+        document.getElementById('flowRate').value = flow;
+        calculate();
+      });
+      tbody.appendChild(tr);
+    });
+  }
+
+  function fmt(n, dec = 1) {
+    return Number(n.toFixed(dec)).toLocaleString();
+  }
+
+  document.querySelectorAll('input').forEach(el => el.addEventListener('input', calculate));
+  calculate();
+</script>
+</body>
+</html>
