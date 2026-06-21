@@ -424,10 +424,17 @@
     .flow-table tr:hover td { background: #f4faf4; cursor: pointer; }
     .flow-table tr.active:hover td { background: #e8f5e9; }
 
+    .table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
     @media (max-width: 520px) {
+      header { flex-direction: column-reverse; align-items: flex-start; }
+      .header-logo { height: 36px; }
       .hero-grid { grid-template-columns: 1fr; }
       .density-grid { grid-template-columns: 1fr 1fr; }
+      .density-result { grid-column: 1 / -1; }
       .hero-wrap input { font-size: 1.5rem; }
+      .result-grid { grid-template-columns: 1fr; }
+      .crop-btn, .inj-btn { font-size: 0.82rem; padding: 7px 13px; }
       .flow-table { font-size: 0.76rem; }
       .flow-table th, .flow-table td { padding: 7px 8px; }
     }
@@ -562,6 +569,7 @@
   <!-- Flow rate scenario table -->
   <div class="card">
     <h2>Flow Rate Scenarios — <span id="table-qty-label">20</span> acres</h2>
+    <div class="table-scroll">
     <table class="flow-table">
       <thead>
         <tr>
@@ -575,6 +583,7 @@
       </thead>
       <tbody id="flow-tbody"></tbody>
     </table>
+    </div>
     <p class="note">Click any row to set that flow rate above.</p>
   </div>
 
