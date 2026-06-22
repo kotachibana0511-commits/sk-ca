@@ -66,29 +66,22 @@
     .crop-btn:hover { border-color: #2e7d32; color: #1a4d1a; }
     .crop-btn.active { background: #2e7d32; border-color: #2e7d32; color: #fff; }
 
-    /* ── Advanced-only elements ── */
-    .adv-only { display: none; }
-    body.adv .adv-only { display: block; }
-    body.adv .crop-info.adv-only { display: flex; }
-    body:not(.adv) [data-inj="custom"],
-    body:not(.adv) #custom-inj-wrap { display: none !important; }
-
-    /* ── Crop info (advanced) ── */
+    /* ── Crop info (always visible) ── */
     .crop-info {
+      display: flex;
       font-size: 0.82rem;
       background: #f4faf4;
       border-radius: 8px;
       padding: 10px 14px;
       gap: 20px;
       flex-wrap: wrap;
-      margin-bottom: 0;
     }
 
     .crop-info span { display: flex; align-items: center; gap: 4px; }
     .ci-label { color: #7a9a7a; }
     .ci-value { font-weight: 600; color: #1a4d1a; }
 
-    /* ── Plant density panel (advanced) ── */
+    /* ── Plant density panel ── */
     .density-panel {
       margin-top: 16px;
       background: #f4faf4;
@@ -214,12 +207,10 @@
     .inj-btn:hover { border-color: #2e7d32; color: #1a4d1a; }
     .inj-btn.active { background: #2e7d32; border-color: #2e7d32; color: #fff; }
 
-    .inj-btn.over-flow, .inj-btn.impossible {
-      opacity: 0.35; cursor: not-allowed; background: #fff;
+    .inj-btn.over-flow {
+      opacity: 0.35; cursor: not-allowed;
+      border-color: #c8dcc8; color: #7a9a7a; background: #fff;
     }
-
-    .inj-btn.over-flow  { border-color: #c8dcc8; color: #7a9a7a; }
-    .inj-btn.impossible { border-color: #fca5a5; color: #991b1b; }
 
     .custom-inj-wrap {
       display: none;
@@ -304,7 +295,7 @@
     .legend span { display: flex; align-items: center; gap: 5px; }
     .legend .dot { width: 10px; height: 10px; border-radius: 2px; }
 
-    /* ── Advanced toggle button ── */
+    /* ── Advanced toggle ── */
     .adv-toggle-wrap { text-align: center; margin-bottom: 20px; }
 
     .adv-toggle {
@@ -322,34 +313,11 @@
 
     .adv-toggle:hover { border-color: #2e7d32; color: #2e7d32; }
 
-    /* ── Scenario table (advanced) ── */
-    .table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    /* ── Advanced card ── */
+    .adv-card { display: none; }
+    .adv-card.visible { display: block; }
 
-    .flow-table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
-
-    .flow-table th {
-      text-align: right; padding: 8px 12px;
-      background: #f0f8f0; color: #3a5a3a;
-      font-weight: 600; font-size: 0.78rem;
-      border-bottom: 2px solid #c8dcc8;
-    }
-
-    .flow-table th:first-child,
-    .flow-table td:first-child { text-align: left; }
-
-    .flow-table td {
-      padding: 9px 12px;
-      border-bottom: 1px solid #e8f0e8;
-      color: #1a2e1a; text-align: right;
-    }
-
-    .flow-table .inj-col { color: #2e7d32; font-weight: 600; }
-    .flow-table tr:last-child td { border-bottom: none; }
-    .flow-table tr.active td { background: #e8f5e9; font-weight: 600; color: #1a4d1a; }
-    .flow-table tr:hover td { background: #f4faf4; cursor: pointer; }
-    .flow-table tr.active:hover td { background: #e8f5e9; }
-
-    .table-note { font-size: 0.78rem; color: #5a7a5a; margin-top: 14px; }
+    .adv-note { font-size: 0.78rem; color: #5a7a5a; margin-top: 14px; line-height: 1.5; }
 
     /* ── Responsive ── */
     @media (max-width: 520px) {
@@ -362,8 +330,6 @@
       .result-grid { grid-template-columns: 1fr; }
       .crop-btn { font-size: 0.85rem; padding: 9px 14px; }
       .inj-btn  { font-size: 0.82rem; padding: 7px 13px; }
-      .flow-table { font-size: 0.76rem; }
-      .flow-table th, .flow-table td { padding: 7px 8px; }
     }
   </style>
 </head>
@@ -388,14 +354,13 @@
       <button class="crop-btn" data-crop="grapes">Wine Grapes (Mature)</button>
     </div>
 
-    <!-- Advanced: rate + dilution info -->
-    <div class="crop-info adv-only">
+    <div class="crop-info">
       <span><span class="ci-label">Product</span>&nbsp;<span class="ci-value">Skeepon Field</span></span>
       <span><span class="ci-label">Rate</span>&nbsp;<span class="ci-value" id="ci-rate">1 gal/acre</span></span>
       <span><span class="ci-label">Dilution</span>&nbsp;<span class="ci-value" id="ci-dilution">1:250</span></span>
     </div>
 
-    <!-- Advanced: plant density -->
+    <!-- Plant density (tree/vine crops only) -->
     <div class="density-panel" id="density-panel">
       <h3>Plant Density</h3>
       <div class="density-grid">
@@ -423,7 +388,7 @@
     </div>
   </div>
 
-  <!-- Inputs -->
+  <!-- Field Info -->
   <div class="card">
     <h2>Field Info</h2>
     <div class="hero-grid">
@@ -446,11 +411,10 @@
     <div class="inj-row">
       <label>Injector Rate</label>
       <div class="inj-btns">
-        <button class="inj-btn active" data-inj="20">20 gpm</button>
-        <button class="inj-btn" data-inj="15">15 gpm</button>
-        <button class="inj-btn" data-inj="10">10 gpm</button>
         <button class="inj-btn" data-inj="5">5 gpm</button>
-        <!-- Advanced only -->
+        <button class="inj-btn" data-inj="10">10 gpm</button>
+        <button class="inj-btn" data-inj="15">15 gpm</button>
+        <button class="inj-btn active" data-inj="20">20 gpm</button>
         <button class="inj-btn" data-inj="custom">Custom</button>
         <div class="custom-inj-wrap" id="custom-inj-wrap">
           <input type="number" id="customInjRate" min="0.1" step="0.5" placeholder="0">
@@ -493,8 +457,6 @@
       <span><span class="dot" style="background:#81c784"></span>Water / Fertilizer <strong id="legend-water-pct">—</strong></span>
     </div>
 
-    <!-- Advanced: field dilution note -->
-    <p class="adv-only" id="verify-note" style="font-size:0.78rem;color:#5a7a5a;margin-top:14px;line-height:1.5;"></p>
   </div>
 
   <!-- Advanced toggle -->
@@ -502,25 +464,20 @@
     <button class="adv-toggle" id="adv-toggle" onclick="toggleAdvanced()">Show advanced ▼</button>
   </div>
 
-  <!-- Advanced: flow rate scenarios table -->
-  <div class="card adv-only" id="scenarios-card">
-    <h2>Flow Rate Scenarios — <span id="table-qty-label">20</span> acres</h2>
-    <div class="table-scroll">
-      <table class="flow-table">
-        <thead>
-          <tr>
-            <th>Flow (gpm)</th>
-            <th class="inj-col">Injector (gpm)</th>
-            <th>Skeepon Field (gal)</th>
-            <th>Water (gal)</th>
-            <th>Tank total (gal)</th>
-            <th>Run time (min)</th>
-          </tr>
-        </thead>
-        <tbody id="flow-tbody"></tbody>
-      </table>
+  <!-- Advanced: dilution check -->
+  <div class="card adv-card" id="adv-card">
+    <h2>Dilution Check</h2>
+    <div class="result-grid">
+      <div class="result-item">
+        <div class="label">Target dilution</div>
+        <div class="value" id="adv-target">—</div>
+      </div>
+      <div class="result-item">
+        <div class="label">Actual field dilution</div>
+        <div class="value" id="adv-actual">—</div>
+      </div>
     </div>
-    <p class="table-note">Click any row to set that flow rate above.</p>
+    <p class="adv-note" id="adv-note"></p>
   </div>
 
 </div>
@@ -533,8 +490,7 @@
     'grapes':  { rate: 0.008, unit: 'gal/vine', dilution: 125, perPlant: true,  plantLabel: 'vines', rowSpacing: 10, withinRow: 6 },
   };
 
-  const SQFT_PER_ACRE  = 43560;
-  const FLOW_SCENARIOS = [100, 150, 200, 250, 300, 400, 500, 600, 800, 1000];
+  const SQFT_PER_ACRE = 43560;
 
   let activeCrop    = 'tomato';
   let activeInjRate = 20;
@@ -542,9 +498,8 @@
 
   function toggleAdvanced() {
     isAdvanced = !isAdvanced;
-    document.body.classList.toggle('adv', isAdvanced);
+    document.getElementById('adv-card').classList.toggle('visible', isAdvanced);
     document.getElementById('adv-toggle').textContent = isAdvanced ? 'Hide advanced ▲' : 'Show advanced ▼';
-    updateDensityPanel();
   }
 
   function plantsPerAcre() {
@@ -608,14 +563,11 @@
     const flowRate = parseFloat(document.getElementById('flowRate').value) || 0;
     const c        = CROPS[activeCrop];
     const appRate  = effectiveRatePerAcre();
-    const dilution = c.dilution;
     const injRate  = Math.min(activeInjRate, flowRate);
 
     document.querySelectorAll('.inj-btn').forEach(btn => {
       if (btn.dataset.inj === 'custom') return;
-      const val = +btn.dataset.inj;
-      btn.classList.toggle('over-flow',  val > flowRate);
-      btn.classList.toggle('impossible', val <= flowRate && dilution * val < flowRate);
+      btn.classList.toggle('over-flow', +btn.dataset.inj > flowRate);
     });
 
     const warnEl = document.getElementById('inj-warn');
@@ -629,7 +581,7 @@
     if (!acres || !flowRate) return;
 
     const skeepon = acres * appRate;
-    const tankVol = skeepon * dilution * injRate / flowRate;
+    const tankVol = skeepon * c.dilution * injRate / flowRate;
     const water   = tankVol - skeepon;
     const runTime = tankVol / injRate;
     const skeePct = (skeepon / tankVol) * 100;
@@ -638,61 +590,28 @@
     if (water < 0) {
       errorEl.textContent = `Not possible — tank volume (${fmtGal(tankVol)} gal) is smaller than Skeepon needed (${fmtGal(skeepon)} gal). Increase injector rate or reduce flow rate.`;
       errorEl.classList.add('visible');
-      document.getElementById('out-water').innerHTML = '<span style="color:#991b1b">—</span>';
-      document.getElementById('out-tank').innerHTML  = fmtGal(tankVol) + '<span class="small"> gal</span>';
-      document.getElementById('out-time').innerHTML  = '—';
       return;
-    } else {
-      errorEl.classList.remove('visible');
     }
+    errorEl.classList.remove('visible');
 
     document.getElementById('out-skeepon').innerHTML = fmtGal(skeepon) + '<span class="small"> gal</span>';
     document.getElementById('out-water').innerHTML   = fmtGal(water)   + '<span class="small"> gal</span>';
     document.getElementById('out-tank').innerHTML    = fmtGal(tankVol) + '<span class="small"> gal</span>';
-    document.getElementById('out-time').innerHTML    = fmt(runTime)    + '<span class="small"> min</span>';
+    document.getElementById('out-time').innerHTML    = fmt(runTime)     + '<span class="small"> min</span>';
 
     const waterPct = 100 - skeePct;
     const barPct   = Math.max(2, Math.min(skeePct, 98));
-    document.getElementById('bar-skeepon').style.width          = barPct + '%';
-    document.getElementById('legend-skeepon-pct').textContent   = fmt(skeePct, 1) + '%';
-    document.getElementById('legend-water-pct').textContent     = fmt(waterPct, 1) + '%';
+    document.getElementById('bar-skeepon').style.width        = barPct + '%';
+    document.getElementById('legend-skeepon-pct').textContent = fmt(skeePct, 1) + '%';
+    document.getElementById('legend-water-pct').textContent   = fmt(waterPct, 1) + '%';
 
-    const fieldConc = (skeepon / tankVol) * (injRate / flowRate);
-    document.getElementById('verify-note').textContent =
-      `Effective rate: ${fmt(appRate, 4)} gal/acre · Injecting ${injRate} gpm into ${fmt(flowRate)} gpm mainline → 1:${Math.round(1 / fieldConc)} field dilution`;
-
-    document.getElementById('table-qty-label').textContent = acres;
-    renderTable(acres, appRate, injRate, dilution, flowRate);
-  }
-
-  function renderTable(acres, appRate, injRate, dilution, activeFlow) {
-    const skeepon = acres * appRate;
-    const tbody   = document.getElementById('flow-tbody');
-    tbody.innerHTML = '';
-
-    FLOW_SCENARIOS.forEach(flow => {
-      const effInj  = Math.min(injRate, flow);
-      const tank    = skeepon * dilution * effInj / flow;
-      const water   = tank - skeepon;
-      const runTime = tank / effInj;
-      const isActive = Math.abs(flow - activeFlow) < 1;
-
-      const tr = document.createElement('tr');
-      if (isActive) tr.classList.add('active');
-      tr.innerHTML = `
-        <td>${flow}</td>
-        <td class="inj-col">${effInj}</td>
-        <td>${fmtGal(skeepon)}</td>
-        <td>${fmtGal(water)}</td>
-        <td>${fmtGal(tank)}</td>
-        <td>${fmt(runTime)}</td>
-      `;
-      tr.addEventListener('click', () => {
-        document.getElementById('flowRate').value = flow;
-        calculate();
-      });
-      tbody.appendChild(tr);
-    });
+    const fieldConc    = (skeepon / tankVol) * (injRate / flowRate);
+    const targetDil    = c.dilution;
+    const actualDil    = Math.round(1 / fieldConc);
+    document.getElementById('adv-target').textContent = `1:${targetDil}`;
+    document.getElementById('adv-actual').textContent = `1:${actualDil}`;
+    document.getElementById('adv-note').textContent   =
+      `${injRate} gpm injector into ${fmt(flowRate, 0)} gpm mainline · ${fmtGal(skeepon)} gal Skeepon in ${tankVol.toLocaleString()} gal tank`;
   }
 
   function fmt(n, dec = 1) {
