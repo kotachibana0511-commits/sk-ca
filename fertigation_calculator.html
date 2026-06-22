@@ -435,7 +435,7 @@
         <div class="value" id="out-skeepon">—<span class="small">gal</span></div>
       </div>
       <div class="result-item">
-        <div class="label">Water / Fertilizer</div>
+        <div class="label">Water and/or Fertilizer</div>
         <div class="value" id="out-water">—<span class="small">gal</span></div>
       </div>
       <div class="result-item highlight full-width">
@@ -454,7 +454,7 @@
     </div>
     <div class="legend">
       <span><span class="dot" style="background:#2e7d32"></span>Skeepon Field <strong id="legend-skeepon-pct">—</strong></span>
-      <span><span class="dot" style="background:#81c784"></span>Water / Fertilizer <strong id="legend-water-pct">—</strong></span>
+      <span><span class="dot" style="background:#81c784"></span>Water and/or Fertilizer <strong id="legend-water-pct">—</strong></span>
     </div>
 
   </div>
@@ -611,7 +611,7 @@
     document.getElementById('adv-target').textContent = `1:${targetDil}`;
     document.getElementById('adv-actual').textContent = `1:${actualDil}`;
     document.getElementById('adv-note').textContent   =
-      `${injRate} gpm injector into ${fmt(flowRate, 0)} gpm mainline · ${fmtGal(skeepon)} gal Skeepon in ${tankVol.toLocaleString()} gal tank`;
+      `${injRate} gpm injector into ${fmt(flowRate, 0)} gpm mainline · ${fmtGal(skeepon)} gal Skeepon in ${fmtGal(tankVol)} gal tank`;
   }
 
   function fmt(n, dec = 1) {
