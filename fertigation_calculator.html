@@ -263,7 +263,7 @@
       text-transform: uppercase; letter-spacing: 0.05em;
     }
 
-    .result-item .value { font-size: 1.6rem; font-weight: 700; color: #1a3a5a; }
+    .result-item .value { font-size: 2rem; font-weight: 700; color: #1a3a5a; }
 
     .result-item .value .small {
       font-size: 0.85rem; font-weight: 500;
@@ -319,6 +319,43 @@
 
     .adv-note { font-size: 0.78rem; color: #5a7a5a; margin-top: 14px; line-height: 1.5; }
 
+    /* ── Sticky crop bar ── */
+    .sticky-bar {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      background: #f4faf4;
+      border-bottom: 2px solid #2e7d32;
+      padding: 8px 20px;
+      display: none;
+      align-items: center;
+      gap: 20px;
+      font-size: 0.82rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+      flex-wrap: wrap;
+    }
+    .sticky-bar.visible { display: flex; }
+
+    /* ── Copy summary button ── */
+    .copy-btn {
+      display: block;
+      width: 100%;
+      margin-top: 18px;
+      padding: 11px;
+      background: #fff;
+      border: 1.5px solid #c8dcc8;
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: #4a6e4a;
+      cursor: pointer;
+      transition: all 0.15s;
+      text-align: center;
+    }
+    .copy-btn:hover { border-color: #2e7d32; color: #2e7d32; }
+    .copy-btn.copied { background: #e8f5e9; border-color: #2e7d32; color: #1a4d1a; }
+
     /* ── Responsive ── */
     @media (max-width: 520px) {
       header { flex-direction: column-reverse; align-items: flex-start; }
@@ -334,6 +371,13 @@
   </style>
 </head>
 <body>
+<div class="sticky-bar" id="sticky-bar">
+    <span><span class="ci-label">Crop</span>&nbsp;<span class="ci-value" id="sb-crop">Tomato (Processing)</span></span>
+    <span><span class="ci-label">Conc. Rate</span>&nbsp;<span class="ci-value" id="sb-rate">1 gal/acre</span></span>
+    <span><span class="ci-label">Diluted Rate</span>&nbsp;<span class="ci-value" id="sb-diluted">250 gal/acre</span></span>
+    <span><span class="ci-label">Dilution</span>&nbsp;<span class="ci-value" id="sb-dilution">1:250</span></span>
+  </div>
+
 <div class="container">
 
   <header>
@@ -356,7 +400,8 @@
 
     <div class="crop-info">
       <span><span class="ci-label">Product</span>&nbsp;<span class="ci-value">Skeepon Field</span></span>
-      <span><span class="ci-label">Rate</span>&nbsp;<span class="ci-value" id="ci-rate">1 gal/acre</span></span>
+      <span><span class="ci-label">Conc. Rate</span>&nbsp;<span class="ci-value" id="ci-rate">1 gal/acre</span></span>
+      <span><span class="ci-label">Diluted Rate</span>&nbsp;<span class="ci-value" id="ci-rate-diluted">250 gal/acre</span></span>
       <span><span class="ci-label">Dilution</span>&nbsp;<span class="ci-value" id="ci-dilution">1:250</span></span>
     </div>
 
@@ -395,14 +440,14 @@
       <div class="hero-field">
         <label>Acreage</label>
         <div class="hero-wrap">
-          <input type="number" id="acres" value="20" min="1" step="1">
+          <input type="number" id="acres" value="20" min="1" step="1" placeholder="e.g. 20">
           <span class="unit">acres</span>
         </div>
       </div>
       <div class="hero-field">
         <label>Flow Rate</label>
         <div class="hero-wrap">
-          <input type="number" id="flowRate" value="250" min="50" step="50">
+          <input type="number" id="flowRate" value="250" min="50" step="50" placeholder="e.g. 250">
           <span class="unit">gpm</span>
         </div>
       </div>
@@ -456,6 +501,7 @@
       <span><span class="dot" style="background:#2e7d32"></span>Skeepon Field <strong id="legend-skeepon-pct">—</strong></span>
       <span><span class="dot" style="background:#81c784"></span>Water and/or Fertilizer <strong id="legend-water-pct">—</strong></span>
     </div>
+    <button class="copy-btn" id="copy-btn" onclick="copySummary()">Copy mix summary</button>
 
   </div>
 
@@ -485,7 +531,7 @@
 <script>
   const CROPS = {
     'tomato':  { rate: 1,     unit: 'gal/acre', dilution: 250, perPlant: false, rowSpacing: null, withinRow: null },
-    'almonds': { rate: 0.004, unit: 'gal/tree', dilution: 250, perPlant: true,  plantLabel: 'trees', rowSpacing: 20, withinRow: 18 },
+    'almonds': { rate: 0.004, unit: 'gal/tree', dilution: 250, perPlant: true,  plantLabel: 'trees', rowSpacing: 21, withinRow: 18 },
     'peppers': { rate: 1,     unit: 'gal/acre', dilution: 250, perPlant: false, rowSpacing: null, withinRow: null },
     'grapes':  { rate: 0.008, unit: 'gal/vine', dilution: 125, perPlant: true,  plantLabel: 'vines', rowSpacing: 10, withinRow: 6 },
   };
@@ -536,8 +582,14 @@
     activeCrop = key;
     const c = CROPS[key];
     document.querySelectorAll('.crop-btn').forEach(b => b.classList.toggle('active', b.dataset.crop === key));
-    document.getElementById('ci-rate').textContent     = `${c.rate} ${c.unit}`;
-    document.getElementById('ci-dilution').textContent = `1:${c.dilution}`;
+    document.getElementById('ci-rate').textContent          = `${c.rate} ${c.unit}`;
+    document.getElementById('ci-rate-diluted').textContent  = `${fmt(c.rate * c.dilution, 0)} ${c.unit}`;
+    document.getElementById('ci-dilution').textContent      = `1:${c.dilution}`;
+    const cropLabel = document.querySelector(`.crop-btn[data-crop="${key}"]`).textContent;
+    document.getElementById('sb-crop').textContent     = cropLabel;
+    document.getElementById('sb-rate').textContent     = `${c.rate} ${c.unit}`;
+    document.getElementById('sb-diluted').textContent  = `${fmt(c.rate * c.dilution, 0)} ${c.unit}`;
+    document.getElementById('sb-dilution').textContent = `1:${c.dilution}`;
     updateDensityPanel();
     calculate();
   }
@@ -636,6 +688,32 @@
   document.getElementById('rowSpacing').addEventListener('input', () => { refreshDensityDisplay(); calculate(); });
   document.getElementById('withinRow').addEventListener('input',  () => { refreshDensityDisplay(); calculate(); });
   document.querySelectorAll('#acres, #flowRate').forEach(el => el.addEventListener('input', calculate));
+
+  // Sticky bar — appears when the crop card leaves the viewport
+  const stickyBar = document.getElementById('sticky-bar');
+  const cropCard  = document.querySelector('.card');
+  function updateStickyBar() {
+    stickyBar.classList.toggle('visible', cropCard.getBoundingClientRect().bottom < 0);
+  }
+  document.addEventListener('scroll', updateStickyBar, { passive: true });
+  window.addEventListener('scroll', updateStickyBar, { passive: true });
+  updateStickyBar();
+
+  function copySummary() {
+    const crop    = document.getElementById('sb-crop').textContent;
+    const acres   = document.getElementById('acres').value || '—';
+    const flow    = document.getElementById('flowRate').value || '—';
+    const skeepon = document.getElementById('out-skeepon').textContent.replace(/[^\d.,]/g, '') || '—';
+    const water   = document.getElementById('out-water').textContent.replace(/[^\d.,]/g, '')   || '—';
+    const time    = document.getElementById('out-time').textContent.replace(/[^\d.,]/g, '')     || '—';
+    const text    = `${acres} ac · ${crop} · ${flow} gpm flow · ${activeInjRate} gpm injector → ${skeepon} gal Skeepon + ${water} gal water · ${time} min run`;
+    navigator.clipboard.writeText(text).then(() => {
+      const btn = document.getElementById('copy-btn');
+      btn.textContent = 'Copied!';
+      btn.classList.add('copied');
+      setTimeout(() => { btn.textContent = 'Copy mix summary'; btn.classList.remove('copied'); }, 2000);
+    });
+  }
 
   selectCrop('tomato');
 </script>
