@@ -3,33 +3,69 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Skeepon Field Fertigation Calculator</title>
+  <title>Skeepon Fertigation Calculator</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: #f0f4f0;
-      color: #1a2e1a;
+      background: #f2f4f6;
+      color: #1a2030;
       min-height: 100vh;
       padding: 32px 16px;
     }
 
     .container { max-width: 720px; margin: 0 auto; }
 
+    /* ── Header ── */
     header {
-      margin-bottom: 28px;
+      margin-bottom: 24px;
       display: flex;
       align-items: flex-start;
       justify-content: space-between;
       gap: 16px;
     }
+    header h1 { font-size: 1.5rem; font-weight: 700; color: #1a2030; }
+    header p  { margin-top: 6px; color: #6a7a8a; font-size: 0.9rem; }
+    .header-logo { height: 44px; width: auto; flex-shrink: 0; }
 
-    header h1 { font-size: 1.6rem; font-weight: 700; color: #1a4d1a; }
-    header p  { margin-top: 6px; color: #4a6e4a; font-size: 0.92rem; }
+    /* ── Tab nav ── */
+    .tab-nav {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 24px;
+      padding: 6px;
+      background: #fff;
+      border-radius: 14px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    }
 
-    .header-logo { height: 48px; width: auto; flex-shrink: 0; }
+    .tab-btn {
+      flex: 1;
+      padding: 13px 16px;
+      border-radius: 10px;
+      border: none;
+      font-family: inherit;
+      font-size: 0.92rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      color: #8a9aaa;
+      background: transparent;
+      line-height: 1.3;
+    }
 
+    .tab-btn .tab-label { display: block; font-size: 0.75rem; font-weight: 400; margin-top: 2px; opacity: 0.75; }
+
+    .tab-btn.active.gh-tab   { background: #2e7d32; color: #fff; box-shadow: 0 2px 8px rgba(46,125,50,0.3); }
+    .tab-btn.active.field-tab { background: #1565c0; color: #fff; box-shadow: 0 2px 8px rgba(21,101,192,0.3); }
+    .tab-btn:not(.active):hover { background: #f0f2f4; color: #1a2030; }
+
+    /* ── Sections ── */
+    .section { display: none; }
+    .section.active { display: block; }
+
+    /* ── Shared card ── */
     .card {
       background: #fff;
       border-radius: 12px;
@@ -37,25 +73,107 @@
       margin-bottom: 20px;
       box-shadow: 0 1px 4px rgba(0,0,0,0.08);
     }
-
     .card h2 {
       font-size: 0.78rem;
       font-weight: 600;
       text-transform: uppercase;
       letter-spacing: 0.08em;
-      color: #4a6e4a;
       margin-bottom: 18px;
     }
 
-    /* ── Crop selector ── */
-    .crop-grid { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 14px; }
+    /* ══════════════════════════════════════════
+       GH THEME — green
+    ══════════════════════════════════════════ */
+    .gh-theme .card h2              { color: #4a6e4a; }
+    .gh-theme .crop-btn             { border-color: #c8dcc8; color: #3a5a3a; background: #fff; }
+    .gh-theme .crop-btn:hover       { border-color: #2e7d32; color: #1a4d1a; }
+    .gh-theme .crop-btn.active      { background: #2e7d32; border-color: #2e7d32; color: #fff; }
+    .gh-theme .crop-info            { background: #f4faf4; }
+    .gh-theme .ci-label             { color: #7a9a7a; }
+    .gh-theme .ci-value             { color: #1a4d1a; }
+    .gh-theme .hero-field label     { color: #2e7d32; }
+    .gh-theme .hero-wrap            { border-color: #2e7d32; }
+    .gh-theme .hero-wrap:focus-within { box-shadow: 0 0 0 3px rgba(46,125,50,0.15); }
+    .gh-theme .hero-wrap input      { color: #1a4d1a; }
+    .gh-theme .hero-wrap .unit      { color: #4a6e4a; }
+    .gh-theme .result-item          { background: #f4faf4; border-color: #c8dcc8; }
+    .gh-theme .result-item.highlight { background: #e8f5e9; border-color: #2e7d32; }
+    .gh-theme .result-item .label   { color: #4a6e4a; }
+    .gh-theme .result-item .value   { color: #1a4d1a; }
+    .gh-theme .result-item .value .small { color: #4a6e4a; }
+    .gh-theme .seg-product          { background: #2e7d32; }
+    .gh-theme .seg-filler           { background: #81c784; color: #1a4d1a; }
+    .gh-theme .legend               { color: #4a6e4a; }
+    .gh-theme .copy-btn             { border-color: #c8dcc8; color: #4a6e4a; }
+    .gh-theme .copy-btn:hover       { border-color: #2e7d32; color: #2e7d32; }
+    .gh-theme .copy-btn.copied      { background: #e8f5e9; border-color: #2e7d32; color: #1a4d1a; }
 
+    /* dosimeter note */
+    .dosimeter-note {
+      background: #f4faf4;
+      border: 1.5px solid #c8dcc8;
+      border-radius: 10px;
+      padding: 14px 18px;
+      margin-bottom: 20px;
+      font-size: 0.84rem;
+      line-height: 1.55;
+      color: #3a5a3a;
+    }
+    .dosimeter-note strong { display: block; font-size: 0.9rem; color: #1a4d1a; margin-bottom: 4px; }
+
+    /* ══════════════════════════════════════════
+       FIELD THEME — blue
+    ══════════════════════════════════════════ */
+    .field-theme .card h2              { color: #4a6a8a; }
+    .field-theme .crop-btn             { border-color: #b8cce0; color: #3a5a7a; background: #fff; }
+    .field-theme .crop-btn:hover       { border-color: #1565c0; color: #1a3a5a; }
+    .field-theme .crop-btn.active      { background: #1565c0; border-color: #1565c0; color: #fff; }
+    .field-theme .crop-info            { background: #f0f4f8; }
+    .field-theme .ci-label             { color: #7a8a9a; }
+    .field-theme .ci-value             { color: #1a3a5a; }
+    .field-theme .density-panel        { background: #f0f4f8; border-color: #b8cce0; }
+    .field-theme .density-panel h3     { color: #4a6a8a; }
+    .field-theme .density-field label  { color: #5a6a7a; }
+    .field-theme .density-wrap         { border-color: #b8cce0; }
+    .field-theme .density-wrap:focus-within { border-color: #1565c0; }
+    .field-theme .density-wrap input   { color: #1a3a5a; }
+    .field-theme .density-wrap .unit   { color: #5a6a7a; }
+    .field-theme .density-result       { background: #dbeafe; border-color: #1565c0; }
+    .field-theme .density-result .dr-label { color: #4a6a8a; }
+    .field-theme .density-result .dr-value { color: #1a3a5a; }
+    .field-theme .density-result .dr-sub   { color: #4a6a8a; }
+    .field-theme .hero-field label     { color: #1565c0; }
+    .field-theme .hero-wrap            { border-color: #1565c0; }
+    .field-theme .hero-wrap:focus-within { box-shadow: 0 0 0 3px rgba(21,101,192,0.15); }
+    .field-theme .hero-wrap input      { color: #1a3a5a; }
+    .field-theme .hero-wrap .unit      { color: #4a6a8a; }
+    .field-theme .inj-row label        { color: #1565c0; }
+    .field-theme .inj-btn              { border-color: #b8cce0; color: #3a5a7a; background: #fff; }
+    .field-theme .inj-btn:hover        { border-color: #1565c0; color: #1a3a5a; }
+    .field-theme .inj-btn.active       { background: #1565c0; border-color: #1565c0; color: #fff; }
+    .field-theme .custom-inj-wrap      { border-color: #1565c0; background: #f0f4f8; }
+    .field-theme .custom-inj-wrap .unit { color: #4a6a8a; }
+    .field-theme .result-item          { background: #f0f4f8; border-color: #b8cce0; }
+    .field-theme .result-item.highlight { background: #dbeafe; border-color: #3b82f6; }
+    .field-theme .result-item .label   { color: #4a6a8a; }
+    .field-theme .result-item .value   { color: #1a3a5a; }
+    .field-theme .result-item .value .small { color: #4a6a8a; }
+    .field-theme .seg-product          { background: #1565c0; }
+    .field-theme .seg-filler           { background: #90caf9; color: #1a3a5a; }
+    .field-theme .legend               { color: #4a6a8a; }
+    .field-theme .copy-btn             { border-color: #b8cce0; color: #4a6a8a; }
+    .field-theme .copy-btn:hover       { border-color: #1565c0; color: #1565c0; }
+    .field-theme .copy-btn.copied      { background: #dbeafe; border-color: #1565c0; color: #1a3a5a; }
+    .field-theme .adv-toggle           { border-color: #b8cce0; color: #4a6a8a; }
+    .field-theme .adv-toggle:hover     { border-color: #1565c0; color: #1565c0; }
+    .field-theme .adv-note             { color: #4a6a8a; }
+
+    /* ── Crop selector (shared) ── */
+    .crop-grid { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 14px; }
     .crop-btn {
       padding: 10px 18px;
       border-radius: 20px;
-      border: 2px solid #c8dcc8;
-      background: #fff;
-      color: #3a5a3a;
+      border: 2px solid;
       font-size: 0.9rem;
       font-weight: 500;
       font-family: inherit;
@@ -63,298 +181,158 @@
       transition: all 0.15s;
     }
 
-    .crop-btn:hover { border-color: #2e7d32; color: #1a4d1a; }
-    .crop-btn.active { background: #2e7d32; border-color: #2e7d32; color: #fff; }
-
-    /* ── Crop info (always visible) ── */
+    /* ── Crop info bar (shared) ── */
     .crop-info {
       display: flex;
       font-size: 0.82rem;
-      background: #f4faf4;
       border-radius: 8px;
       padding: 10px 14px;
       gap: 20px;
       flex-wrap: wrap;
     }
-
     .crop-info span { display: flex; align-items: center; gap: 4px; }
-    .ci-label { color: #7a9a7a; }
-    .ci-value { font-weight: 600; color: #1a4d1a; }
+    .ci-value { font-weight: 600; }
 
-    /* ── Plant density panel ── */
+    /* ── Plant density panel (Field only) ── */
     .density-panel {
       margin-top: 16px;
-      background: #f4faf4;
-      border: 1.5px solid #c8dcc8;
+      border: 1.5px solid;
       border-radius: 10px;
       padding: 16px;
       display: none;
     }
-
     .density-panel.visible { display: block; }
-
     .density-panel h3 {
-      font-size: 0.75rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.07em;
-      color: #4a6e4a;
-      margin-bottom: 12px;
+      font-size: 0.75rem; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.07em; margin-bottom: 12px;
     }
-
     .density-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; align-items: end; }
-
     .density-field { display: flex; flex-direction: column; gap: 5px; }
-    .density-field label { font-size: 0.75rem; font-weight: 500; color: #5a7a5a; }
-
+    .density-field label { font-size: 0.75rem; font-weight: 500; }
     .density-wrap {
-      display: flex;
-      align-items: center;
-      border: 1.5px solid #c8dcc8;
-      border-radius: 8px;
-      overflow: hidden;
-      background: #fff;
-      transition: border-color 0.15s;
+      display: flex; align-items: center; border: 1.5px solid;
+      border-radius: 8px; overflow: hidden; background: #fff; transition: border-color 0.15s;
     }
-
-    .density-wrap:focus-within { border-color: #2e7d32; }
-
     .density-wrap input {
-      flex: 1; border: none; outline: none;
-      padding: 7px 10px; font-size: 0.92rem;
-      font-family: inherit; color: #1a2e1a;
-      background: transparent; width: 0;
+      flex: 1; border: none; outline: none; padding: 7px 10px;
+      font-size: 0.92rem; font-family: inherit; background: transparent; width: 0;
     }
-
-    .density-wrap .unit { padding: 7px 8px 7px 2px; font-size: 0.72rem; color: #6a8e6a; white-space: nowrap; }
-
+    .density-wrap .unit { padding: 7px 8px 7px 2px; font-size: 0.72rem; white-space: nowrap; }
     .density-result {
-      background: #e8f5e9;
-      border: 1.5px solid #2e7d32;
-      border-radius: 8px;
-      padding: 7px 12px;
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
+      border: 1.5px solid; border-radius: 8px; padding: 7px 12px;
+      display: flex; flex-direction: column; gap: 2px;
     }
+    .density-result .dr-label { font-size: 0.72rem; }
+    .density-result .dr-value { font-size: 1rem; font-weight: 700; }
+    .density-result .dr-sub   { font-size: 0.72rem; margin-top: 2px; }
 
-    .density-result .dr-label { font-size: 0.72rem; color: #4a6e4a; }
-    .density-result .dr-value { font-size: 1rem; font-weight: 700; color: #1a4d1a; }
-    .density-result .dr-sub   { font-size: 0.72rem; color: #4a6e4a; margin-top: 2px; }
-
-    /* ── Hero inputs ── */
+    /* ── Hero inputs (shared) ── */
     .hero-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
-
+    .hero-grid.single { grid-template-columns: 1fr; }
     .hero-field { display: flex; flex-direction: column; gap: 8px; }
-
     .hero-field label {
-      font-size: 0.82rem;
-      font-weight: 600;
-      color: #2e7d32;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
+      font-size: 0.82rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em;
     }
-
     .hero-wrap {
-      display: flex;
-      align-items: baseline;
-      border: 2px solid #2e7d32;
-      border-radius: 10px;
-      overflow: hidden;
-      background: #fff;
-      cursor: text;
-      transition: box-shadow 0.15s;
+      display: flex; align-items: baseline; border: 2px solid; border-radius: 10px;
+      overflow: hidden; background: #fff; cursor: text; transition: box-shadow 0.15s;
     }
-
-    .hero-wrap:focus-within { box-shadow: 0 0 0 3px rgba(46,125,50,0.15); }
-
     .hero-wrap input {
-      flex: 1; border: none; outline: none;
-      padding: 14px 12px;
-      font-size: 2rem; font-weight: 700;
-      font-family: inherit; color: #1a4d1a;
-      background: transparent; width: 0;
+      flex: 1; border: none; outline: none; padding: 14px 12px;
+      font-size: 2rem; font-weight: 700; font-family: inherit; background: transparent; width: 0;
     }
-
     .hero-wrap .unit {
-      padding: 14px 14px 14px 4px;
-      font-size: 0.85rem; font-weight: 500;
-      color: #4a6e4a; white-space: nowrap;
+      padding: 14px 14px 14px 4px; font-size: 0.85rem; font-weight: 500; white-space: nowrap;
     }
 
-    /* ── Injection rate ── */
+    /* ── Injector rate (Field only) ── */
     .inj-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
-
     .inj-row label {
-      font-size: 0.82rem; font-weight: 600;
-      color: #2e7d32; text-transform: uppercase;
+      font-size: 0.82rem; font-weight: 600; text-transform: uppercase;
       letter-spacing: 0.06em; white-space: nowrap;
     }
-
     .inj-btns { display: flex; gap: 8px; flex-wrap: wrap; }
-
     .inj-btn {
-      padding: 8px 18px;
-      border-radius: 20px;
-      border: 2px solid #c8dcc8;
-      background: #fff;
-      color: #3a5a3a;
-      font-size: 0.88rem; font-weight: 600;
-      font-family: inherit; cursor: pointer;
-      transition: all 0.15s;
+      padding: 8px 18px; border-radius: 20px; border: 2px solid;
+      font-size: 0.88rem; font-weight: 600; font-family: inherit; cursor: pointer; transition: all 0.15s;
     }
-
-    .inj-btn:hover { border-color: #2e7d32; color: #1a4d1a; }
-    .inj-btn.active { background: #2e7d32; border-color: #2e7d32; color: #fff; }
-
-    .inj-btn.over-flow {
-      opacity: 0.35; cursor: not-allowed;
-      border-color: #c8dcc8; color: #7a9a7a; background: #fff;
-    }
-
+    .inj-btn.over-flow { opacity: 0.35; cursor: not-allowed; }
     .custom-inj-wrap {
-      display: none;
-      align-items: center;
-      border: 2px solid #2e7d32;
-      border-radius: 20px;
-      overflow: hidden;
-      background: #f4faf4;
+      display: none; align-items: center; border: 2px solid;
+      border-radius: 20px; overflow: hidden;
     }
-
     .custom-inj-wrap.visible { display: flex; }
-
     .custom-inj-wrap input {
-      border: none; outline: none;
-      padding: 6px 10px;
-      font-size: 0.88rem; font-weight: 600;
-      font-family: inherit; color: #1a4d1a;
+      border: none; outline: none; padding: 6px 10px;
+      font-size: 0.88rem; font-weight: 600; font-family: inherit;
       background: transparent; width: 56px;
     }
-
-    .custom-inj-wrap .unit { padding: 6px 12px 6px 0; font-size: 0.78rem; color: #4a6e4a; }
+    .custom-inj-wrap .unit { padding: 6px 12px 6px 0; font-size: 0.78rem; }
 
     /* ── Warnings ── */
     .warn-note, .error-note {
-      border-radius: 8px; padding: 10px 14px;
-      margin-top: 12px; display: none; font-size: 0.82rem;
+      border-radius: 8px; padding: 10px 14px; margin-top: 12px; display: none; font-size: 0.82rem;
     }
-
-    .warn-note { color: #b45309; background: #fffbeb; border: 1.5px solid #fcd34d; }
+    .warn-note  { color: #b45309; background: #fffbeb; border: 1.5px solid #fcd34d; }
     .error-note { color: #991b1b; background: #fef2f2; border: 1.5px solid #fca5a5; margin-top: 0; margin-bottom: 16px; }
     .warn-note.visible, .error-note.visible { display: block; }
 
-    /* ── Results ── */
+    /* ── Results grid (shared) ── */
     .result-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-
-    .result-item {
-      background: #f0f4f8;
-      border: 1.5px solid #b8cce0;
-      border-radius: 10px;
-      padding: 14px 16px;
-      cursor: default; user-select: none;
-    }
-
-    .result-item.highlight { background: #dbeafe; border-color: #3b82f6; }
+    .result-item { border: 1.5px solid; border-radius: 10px; padding: 14px 16px; cursor: default; user-select: none; }
     .result-item.full-width { grid-column: 1 / -1; }
-
     .result-item .label {
-      font-size: 0.75rem; color: #4a6a8a;
-      margin-bottom: 4px;
-      text-transform: uppercase; letter-spacing: 0.05em;
+      font-size: 0.75rem; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.05em;
     }
+    .result-item .value { font-size: 2rem; font-weight: 700; }
+    .result-item .value .small { font-size: 0.85rem; font-weight: 500; margin-left: 3px; }
 
-    .result-item .value { font-size: 2rem; font-weight: 700; color: #1a3a5a; }
-
-    .result-item .value .small {
-      font-size: 0.85rem; font-weight: 500;
-      color: #4a6a8a; margin-left: 3px;
-    }
-
-    /* ── Tank bar ── */
-    .tank-bar {
-      height: 28px; border-radius: 6px;
-      overflow: hidden; display: flex;
-      margin: 18px 0 10px;
-    }
-
-    .seg-skeepon {
-      background: #2e7d32;
+    /* ── Tank bar (shared) ── */
+    .tank-bar { height: 28px; border-radius: 6px; overflow: hidden; display: flex; margin: 18px 0 10px; }
+    .seg-product {
       display: flex; align-items: center; justify-content: center;
       color: #fff; font-size: 0.72rem; font-weight: 600;
       transition: width 0.3s; white-space: nowrap; overflow: hidden;
     }
-
-    .seg-water {
-      background: #81c784; flex: 1;
-      display: flex; align-items: center; justify-content: center;
-      color: #1a4d1a; font-size: 0.72rem; font-weight: 600;
-      white-space: nowrap; overflow: hidden;
+    .seg-filler {
+      flex: 1; display: flex; align-items: center; justify-content: center;
+      font-size: 0.72rem; font-weight: 600; white-space: nowrap; overflow: hidden;
     }
-
-    .legend { display: flex; gap: 18px; font-size: 0.78rem; color: #4a6e4a; }
+    .legend { display: flex; gap: 18px; font-size: 0.78rem; }
     .legend span { display: flex; align-items: center; gap: 5px; }
-    .legend .dot { width: 10px; height: 10px; border-radius: 2px; }
+    .legend .dot { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
 
-    /* ── Advanced toggle ── */
-    .adv-toggle-wrap { text-align: center; margin-bottom: 20px; }
-
-    .adv-toggle {
-      background: #fff;
-      border: 1.5px solid #c8dcc8;
-      border-radius: 20px;
-      padding: 10px 24px;
-      font-size: 0.85rem;
-      font-weight: 500;
-      color: #4a6e4a;
-      font-family: inherit;
-      cursor: pointer;
-      transition: all 0.15s;
+    /* ── Copy button (shared) ── */
+    .copy-btn {
+      display: block; width: 100%; margin-top: 18px; padding: 11px;
+      background: #fff; border: 1.5px solid; border-radius: 8px;
+      font-family: inherit; font-size: 0.85rem; font-weight: 500;
+      cursor: pointer; transition: all 0.15s; text-align: center;
     }
 
-    .adv-toggle:hover { border-color: #2e7d32; color: #2e7d32; }
-
-    /* ── Advanced card ── */
+    /* ── Advanced (Field only) ── */
+    .adv-toggle-wrap { text-align: center; margin-bottom: 20px; }
+    .adv-toggle {
+      background: #fff; border: 1.5px solid; border-radius: 20px;
+      padding: 10px 24px; font-size: 0.85rem; font-weight: 500;
+      font-family: inherit; cursor: pointer; transition: all 0.15s;
+    }
     .adv-card { display: none; }
     .adv-card.visible { display: block; }
+    .adv-note { font-size: 0.78rem; margin-top: 14px; line-height: 1.5; }
 
-    .adv-note { font-size: 0.78rem; color: #5a7a5a; margin-top: 14px; line-height: 1.5; }
-
-    /* ── Sticky crop bar ── */
+    /* ── Sticky bar ── */
     .sticky-bar {
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      z-index: 100;
-      background: #f4faf4;
-      border-bottom: 2px solid #2e7d32;
-      padding: 8px 20px;
-      display: none;
-      align-items: center;
-      gap: 20px;
-      font-size: 0.82rem;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.12);
-      flex-wrap: wrap;
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      padding: 8px 20px; display: none; align-items: center; gap: 20px;
+      font-size: 0.82rem; box-shadow: 0 2px 8px rgba(0,0,0,0.12); flex-wrap: wrap;
     }
     .sticky-bar.visible { display: flex; }
-
-    /* ── Copy summary button ── */
-    .copy-btn {
-      display: block;
-      width: 100%;
-      margin-top: 18px;
-      padding: 11px;
-      background: #fff;
-      border: 1.5px solid #c8dcc8;
-      border-radius: 8px;
-      font-family: inherit;
-      font-size: 0.85rem;
-      font-weight: 500;
-      color: #4a6e4a;
-      cursor: pointer;
-      transition: all 0.15s;
-      text-align: center;
-    }
-    .copy-btn:hover { border-color: #2e7d32; color: #2e7d32; }
-    .copy-btn.copied { background: #e8f5e9; border-color: #2e7d32; color: #1a4d1a; }
+    .sticky-bar.gh-bar    { background: #f4faf4; border-bottom: 2px solid #2e7d32; }
+    .sticky-bar.field-bar { background: #f0f4f8; border-bottom: 2px solid #1565c0; }
+    .sticky-bar .ci-label { color: #7a8a9a; }
+    .sticky-bar.gh-bar .ci-value    { color: #1a4d1a; font-weight: 600; }
+    .sticky-bar.field-bar .ci-value { color: #1a3a5a; font-weight: 600; }
 
     /* ── Responsive ── */
     @media (max-width: 520px) {
@@ -367,181 +345,373 @@
       .result-grid { grid-template-columns: 1fr; }
       .crop-btn { font-size: 0.85rem; padding: 9px 14px; }
       .inj-btn  { font-size: 0.82rem; padding: 7px 13px; }
+      .tab-btn  { font-size: 0.82rem; padding: 10px 10px; }
     }
   </style>
 </head>
 <body>
-<div class="sticky-bar" id="sticky-bar">
-    <span><span class="ci-label">Crop</span>&nbsp;<span class="ci-value" id="sb-crop">Tomato (Processing)</span></span>
-    <span><span class="ci-label">Conc. Rate</span>&nbsp;<span class="ci-value" id="sb-rate">1 gal/acre</span></span>
-    <span><span class="ci-label">Diluted Rate</span>&nbsp;<span class="ci-value" id="sb-diluted">250 gal/acre</span></span>
-    <span><span class="ci-label">Dilution</span>&nbsp;<span class="ci-value" id="sb-dilution">1:250</span></span>
+
+<!-- Sticky bar — content swaps per active tab -->
+<div class="sticky-bar gh-bar" id="sticky-bar">
+  <div id="sb-gh" style="display:flex;align-items:center;gap:20px;flex-wrap:wrap;">
+    <span><span class="ci-label">Crop</span>&nbsp;<span class="ci-value" id="sb-gh-crop">Tomato (Greenhouse)</span></span>
+    <span><span class="ci-label">Dilution</span>&nbsp;<span class="ci-value" id="sb-gh-dilution">1:50</span></span>
   </div>
+  <div id="sb-field" style="display:none;align-items:center;gap:20px;flex-wrap:wrap;">
+    <span><span class="ci-label">Crop</span>&nbsp;<span class="ci-value" id="sb-field-crop">Tomato (Processing)</span></span>
+    <span><span class="ci-label">Rate</span>&nbsp;<span class="ci-value" id="sb-field-rate">1 gal/acre</span></span>
+    <span><span class="ci-label">Dilution</span>&nbsp;<span class="ci-value" id="sb-field-dilution">1:250</span></span>
+  </div>
+</div>
 
 <div class="container">
 
   <header>
     <div>
-      <h1>Skeepon Field Fertigation Calculator</h1>
-      <p>California irrigation — stock tank mix for consistent field delivery</p>
+      <h1>Skeepon Fertigation Calculator</h1>
+      <p>California applications — consistent delivery for every field and greenhouse</p>
     </div>
     <img src="logo_ac-planta.png" alt="Ac-Planta" class="header-logo">
   </header>
 
-  <!-- Crop selection -->
-  <div class="card">
-    <h2>Crop</h2>
-    <div class="crop-grid">
-      <button class="crop-btn active" data-crop="tomato">Tomato (Processing)</button>
-      <button class="crop-btn" data-crop="almonds">Almonds (Seedlings)</button>
-      <button class="crop-btn" data-crop="peppers">Peppers</button>
-      <button class="crop-btn" data-crop="grapes">Wine Grapes (Mature)</button>
+  <!-- Tab nav -->
+  <div class="tab-nav">
+    <button class="tab-btn gh-tab active" id="tab-gh" onclick="switchTab('gh')">
+      Skeepon Greenhouse
+      <span class="tab-label">Drip / EC-controlled</span>
+    </button>
+    <button class="tab-btn field-tab" id="tab-field" onclick="switchTab('field')">
+      Skeepon Field
+      <span class="tab-label">Open-field fertigation</span>
+    </button>
+  </div>
+
+
+  <!-- ════════════════════════════════════════
+       GREENHOUSE SECTION
+  ════════════════════════════════════════ -->
+  <div class="section gh-theme active" id="section-gh">
+
+    <div class="dosimeter-note">
+      <strong>Using a dosimeter?</strong>
+      Set it to <strong>1:50 (2% v/v)</strong> and you're done — no further calculation needed.
+      Use this calculator only when mixing manually without a dosimeter.
     </div>
 
-    <div class="crop-info">
-      <span><span class="ci-label">Product</span>&nbsp;<span class="ci-value">Skeepon Field</span></span>
-      <span><span class="ci-label">Conc. Rate</span>&nbsp;<span class="ci-value" id="ci-rate">1 gal/acre</span></span>
-      <span><span class="ci-label">Diluted Rate</span>&nbsp;<span class="ci-value" id="ci-rate-diluted">250 gal/acre</span></span>
-      <span><span class="ci-label">Dilution</span>&nbsp;<span class="ci-value" id="ci-dilution">1:250</span></span>
+    <!-- Crop selection -->
+    <div class="card">
+      <h2>Crop</h2>
+      <div class="crop-grid">
+        <button class="crop-btn active" data-gh-crop="tomato-gh">Tomato (Greenhouse)</button>
+        <button class="crop-btn" data-gh-crop="peppers-gh">Peppers (Greenhouse)</button>
+      </div>
+      <div class="crop-info">
+        <span><span class="ci-label">Product</span>&nbsp;<span class="ci-value">Skeepon Greenhouse</span></span>
+        <span><span class="ci-label">Dilution</span>&nbsp;<span class="ci-value" id="gh-ci-dilution">1:50</span></span>
+        <span><span class="ci-label">Concentration</span>&nbsp;<span class="ci-value" id="gh-ci-conc">2.0% v/v</span></span>
+      </div>
     </div>
 
-    <!-- Plant density (tree/vine crops only) -->
-    <div class="density-panel" id="density-panel">
-      <h3>Plant Density</h3>
-      <div class="density-grid">
-        <div class="density-field">
-          <label>Row spacing</label>
-          <div class="density-wrap">
-            <input type="number" id="rowSpacing" value="20" min="0.1" step="0.5">
-            <span class="unit">ft</span>
+    <!-- Tank size -->
+    <div class="card">
+      <h2>Tank Size</h2>
+      <div class="hero-grid single">
+        <div class="hero-field">
+          <label>Tank Volume</label>
+          <div class="hero-wrap">
+            <input type="number" id="gh-tank" value="500" min="10" step="10" placeholder="e.g. 500">
+            <span class="unit">gal</span>
           </div>
         </div>
-        <div class="density-field">
-          <label>Within-row spacing</label>
-          <div class="density-wrap">
-            <input type="number" id="withinRow" value="18" min="0.1" step="0.5">
-            <span class="unit">ft</span>
+      </div>
+    </div>
+
+    <!-- Results -->
+    <div class="card">
+      <h2>Tank Mix</h2>
+      <div class="result-grid">
+        <div class="result-item highlight">
+          <div class="label">Skeepon Greenhouse</div>
+          <div class="value" id="gh-out-skeepon">—<span class="small">gal</span></div>
+        </div>
+        <div class="result-item">
+          <div class="label">Water</div>
+          <div class="value" id="gh-out-water">—<span class="small">gal</span></div>
+        </div>
+        <div class="result-item highlight full-width">
+          <div class="label">Total tank volume</div>
+          <div class="value" id="gh-out-tank">—<span class="small">gal</span></div>
+        </div>
+      </div>
+
+      <div class="tank-bar">
+        <div class="seg-product" id="gh-bar-product" style="width:5%"></div>
+        <div class="seg-filler" id="gh-bar-filler"></div>
+      </div>
+      <div class="legend">
+        <span><span class="dot" style="background:#2e7d32"></span>Skeepon GH&nbsp;<strong id="gh-legend-product-pct">—</strong></span>
+        <span><span class="dot" style="background:#81c784"></span>Water&nbsp;<strong id="gh-legend-water-pct">—</strong></span>
+      </div>
+      <button class="copy-btn" id="gh-copy-btn" onclick="ghCopySummary()">Copy mix summary</button>
+    </div>
+
+  </div><!-- /section-gh -->
+
+
+  <!-- ════════════════════════════════════════
+       FIELD SECTION
+  ════════════════════════════════════════ -->
+  <div class="section field-theme" id="section-field">
+
+    <!-- Crop selection -->
+    <div class="card">
+      <h2>Crop</h2>
+      <div class="crop-grid">
+        <button class="crop-btn active" data-crop="tomato">Tomato (Processing)</button>
+        <button class="crop-btn" data-crop="almonds">Almonds (Seedlings)</button>
+        <button class="crop-btn" data-crop="peppers">Peppers</button>
+        <button class="crop-btn" data-crop="grapes">Wine Grapes (Mature)</button>
+      </div>
+      <div class="crop-info">
+        <span><span class="ci-label">Product</span>&nbsp;<span class="ci-value">Skeepon Field</span></span>
+        <span><span class="ci-label">Conc. Rate</span>&nbsp;<span class="ci-value" id="ci-rate">1 gal/acre</span></span>
+        <span><span class="ci-label">Diluted Rate</span>&nbsp;<span class="ci-value" id="ci-rate-diluted">250 gal/acre</span></span>
+        <span><span class="ci-label">Dilution</span>&nbsp;<span class="ci-value" id="ci-dilution">1:250</span></span>
+      </div>
+
+      <!-- Plant density (tree/vine crops only) -->
+      <div class="density-panel" id="density-panel">
+        <h3>Plant Density</h3>
+        <div class="density-grid">
+          <div class="density-field">
+            <label>Row spacing</label>
+            <div class="density-wrap">
+              <input type="number" id="rowSpacing" value="20" min="0.1" step="0.5">
+              <span class="unit">ft</span>
+            </div>
+          </div>
+          <div class="density-field">
+            <label>Within-row spacing</label>
+            <div class="density-wrap">
+              <input type="number" id="withinRow" value="18" min="0.1" step="0.5">
+              <span class="unit">ft</span>
+            </div>
+          </div>
+          <div class="density-result">
+            <span class="dr-label">Plant density</span>
+            <span class="dr-value" id="density-value">121</span>
+            <span class="dr-sub" id="density-unit">trees/acre</span>
+            <span class="dr-sub" id="effective-rate">→ 121 gal/acre</span>
           </div>
         </div>
-        <div class="density-result">
-          <span class="dr-label">Plant density</span>
-          <span class="dr-value" id="density-value">121</span>
-          <span class="dr-sub" id="density-unit">trees/acre</span>
-          <span class="dr-sub" id="effective-rate">→ 121 gal/acre</span>
+      </div>
+    </div>
+
+    <!-- Field Info -->
+    <div class="card">
+      <h2>Field Info</h2>
+      <div class="hero-grid">
+        <div class="hero-field">
+          <label>Acreage</label>
+          <div class="hero-wrap">
+            <input type="number" id="acres" value="20" min="1" step="1" placeholder="e.g. 20">
+            <span class="unit">acres</span>
+          </div>
+        </div>
+        <div class="hero-field">
+          <label>Flow Rate</label>
+          <div class="hero-wrap">
+            <input type="number" id="flowRate" value="250" min="50" step="50" placeholder="e.g. 250">
+            <span class="unit">gpm</span>
+          </div>
         </div>
       </div>
-    </div>
-  </div>
 
-  <!-- Field Info -->
-  <div class="card">
-    <h2>Field Info</h2>
-    <div class="hero-grid">
-      <div class="hero-field">
-        <label>Acreage</label>
-        <div class="hero-wrap">
-          <input type="number" id="acres" value="20" min="1" step="1" placeholder="e.g. 20">
-          <span class="unit">acres</span>
+      <div class="inj-row">
+        <label>Injector Rate</label>
+        <div class="inj-btns">
+          <button class="inj-btn" data-inj="5">5 gpm</button>
+          <button class="inj-btn" data-inj="10">10 gpm</button>
+          <button class="inj-btn" data-inj="15">15 gpm</button>
+          <button class="inj-btn active" data-inj="20">20 gpm</button>
+          <button class="inj-btn" data-inj="custom">Custom</button>
+          <div class="custom-inj-wrap" id="custom-inj-wrap">
+            <input type="number" id="customInjRate" min="0.1" step="0.5" placeholder="0">
+            <span class="unit">gpm</span>
+          </div>
         </div>
       </div>
-      <div class="hero-field">
-        <label>Flow Rate</label>
-        <div class="hero-wrap">
-          <input type="number" id="flowRate" value="250" min="50" step="50" placeholder="e.g. 250">
-          <span class="unit">gpm</span>
+      <div class="warn-note" id="inj-warn"></div>
+    </div>
+
+    <!-- Tank Mix results -->
+    <div class="card">
+      <h2>Tank Mix</h2>
+      <div class="error-note" id="calc-error"></div>
+      <div class="result-grid">
+        <div class="result-item highlight">
+          <div class="label">Skeepon Field</div>
+          <div class="value" id="out-skeepon">—<span class="small">gal</span></div>
+        </div>
+        <div class="result-item">
+          <div class="label">Water and/or Fertilizer</div>
+          <div class="value" id="out-water">—<span class="small">gal</span></div>
+        </div>
+        <div class="result-item highlight full-width">
+          <div class="label">Total tank volume</div>
+          <div class="value" id="out-tank">—<span class="small">gal</span></div>
+        </div>
+        <div class="result-item full-width">
+          <div class="label">Injection run time</div>
+          <div class="value" id="out-time">—<span class="small">min</span></div>
         </div>
       </div>
+
+      <div class="tank-bar">
+        <div class="seg-product" id="bar-skeepon" style="width:5%"></div>
+        <div class="seg-filler" id="bar-water"></div>
+      </div>
+      <div class="legend">
+        <span><span class="dot" style="background:#1565c0"></span>Skeepon Field&nbsp;<strong id="legend-skeepon-pct">—</strong></span>
+        <span><span class="dot" style="background:#90caf9"></span>Water and/or Fertilizer&nbsp;<strong id="legend-water-pct">—</strong></span>
+      </div>
+      <button class="copy-btn" id="copy-btn" onclick="fieldCopySummary()">Copy mix summary</button>
     </div>
 
-    <div class="inj-row">
-      <label>Injector Rate</label>
-      <div class="inj-btns">
-        <button class="inj-btn" data-inj="5">5 gpm</button>
-        <button class="inj-btn" data-inj="10">10 gpm</button>
-        <button class="inj-btn" data-inj="15">15 gpm</button>
-        <button class="inj-btn active" data-inj="20">20 gpm</button>
-        <button class="inj-btn" data-inj="custom">Custom</button>
-        <div class="custom-inj-wrap" id="custom-inj-wrap">
-          <input type="number" id="customInjRate" min="0.1" step="0.5" placeholder="0">
-          <span class="unit">gpm</span>
+    <!-- Advanced toggle -->
+    <div class="adv-toggle-wrap">
+      <button class="adv-toggle" id="adv-toggle" onclick="toggleAdvanced()">Show advanced ▼</button>
+    </div>
+
+    <!-- Advanced: dilution check -->
+    <div class="card adv-card" id="adv-card">
+      <h2>Dilution Check</h2>
+      <div class="result-grid">
+        <div class="result-item">
+          <div class="label">Target dilution</div>
+          <div class="value" id="adv-target">—</div>
+        </div>
+        <div class="result-item">
+          <div class="label">Actual field dilution</div>
+          <div class="value" id="adv-actual">—</div>
         </div>
       </div>
-    </div>
-    <div class="warn-note" id="inj-warn"></div>
-  </div>
-
-  <!-- Tank Mix results -->
-  <div class="card">
-    <h2>Tank Mix</h2>
-    <div class="error-note" id="calc-error"></div>
-    <div class="result-grid">
-      <div class="result-item highlight">
-        <div class="label">Skeepon Field</div>
-        <div class="value" id="out-skeepon">—<span class="small">gal</span></div>
-      </div>
-      <div class="result-item">
-        <div class="label">Water and/or Fertilizer</div>
-        <div class="value" id="out-water">—<span class="small">gal</span></div>
-      </div>
-      <div class="result-item highlight full-width">
-        <div class="label">Total tank volume</div>
-        <div class="value" id="out-tank">—<span class="small">gal</span></div>
-      </div>
-      <div class="result-item full-width">
-        <div class="label">Injection run time</div>
-        <div class="value" id="out-time">—<span class="small">min</span></div>
-      </div>
+      <p class="adv-note" id="adv-note"></p>
     </div>
 
-    <div class="tank-bar">
-      <div class="seg-skeepon" id="bar-skeepon" style="width:5%"></div>
-      <div class="seg-water" id="bar-water"></div>
-    </div>
-    <div class="legend">
-      <span><span class="dot" style="background:#2e7d32"></span>Skeepon Field <strong id="legend-skeepon-pct">—</strong></span>
-      <span><span class="dot" style="background:#81c784"></span>Water and/or Fertilizer <strong id="legend-water-pct">—</strong></span>
-    </div>
-    <button class="copy-btn" id="copy-btn" onclick="copySummary()">Copy mix summary</button>
+  </div><!-- /section-field -->
 
-  </div>
-
-  <!-- Advanced toggle -->
-  <div class="adv-toggle-wrap">
-    <button class="adv-toggle" id="adv-toggle" onclick="toggleAdvanced()">Show advanced ▼</button>
-  </div>
-
-  <!-- Advanced: dilution check -->
-  <div class="card adv-card" id="adv-card">
-    <h2>Dilution Check</h2>
-    <div class="result-grid">
-      <div class="result-item">
-        <div class="label">Target dilution</div>
-        <div class="value" id="adv-target">—</div>
-      </div>
-      <div class="result-item">
-        <div class="label">Actual field dilution</div>
-        <div class="value" id="adv-actual">—</div>
-      </div>
-    </div>
-    <p class="adv-note" id="adv-note"></p>
-  </div>
-
-</div>
+</div><!-- /container -->
 
 <script>
-  const CROPS = {
-    'tomato':  { rate: 1,     unit: 'gal/acre', dilution: 250, perPlant: false, rowSpacing: null, withinRow: null },
-    'almonds': { rate: 0.004, unit: 'gal/tree', dilution: 250, perPlant: true,  plantLabel: 'trees', rowSpacing: 21, withinRow: 18 },
-    'peppers': { rate: 1,     unit: 'gal/acre', dilution: 250, perPlant: false, rowSpacing: null, withinRow: null },
-    'grapes':  { rate: 0.008, unit: 'gal/vine', dilution: 125, perPlant: true,  plantLabel: 'vines', rowSpacing: 10, withinRow: 6 },
+  /* ── Data ── */
+  const FIELD_CROPS = {
+    tomato:  { rate: 1,     unit: 'gal/acre', dilution: 250, perPlant: false },
+    almonds: { rate: 0.004, unit: 'gal/tree', dilution: 250, perPlant: true,  plantLabel: 'trees', rowSpacing: 21, withinRow: 18 },
+    peppers: { rate: 1,     unit: 'gal/acre', dilution: 250, perPlant: false },
+    grapes:  { rate: 0.008, unit: 'gal/vine', dilution: 125, perPlant: true,  plantLabel: 'vines', rowSpacing: 10, withinRow: 6 },
+  };
+
+  const GH_CROPS = {
+    'tomato-gh':  { dilution: 50, label: 'Tomato (Greenhouse)' },
+    'peppers-gh': { dilution: 50, label: 'Peppers (Greenhouse)' },
   };
 
   const SQFT_PER_ACRE = 43560;
 
+  let activeTab     = 'gh';
   let activeCrop    = 'tomato';
+  let activeGhCrop  = 'tomato-gh';
   let activeInjRate = 20;
   let isAdvanced    = false;
 
+  /* ── Tab switching ── */
+  function switchTab(tab) {
+    activeTab = tab;
+    document.getElementById('section-gh').classList.toggle('active', tab === 'gh');
+    document.getElementById('section-field').classList.toggle('active', tab === 'field');
+    document.getElementById('tab-gh').classList.toggle('active', tab === 'gh');
+    document.getElementById('tab-field').classList.toggle('active', tab === 'field');
+
+    var bar = document.getElementById('sticky-bar');
+    bar.className = tab === 'gh' ? 'sticky-bar gh-bar' : 'sticky-bar field-bar';
+    document.getElementById('sb-gh').style.display    = tab === 'gh'    ? 'flex' : 'none';
+    document.getElementById('sb-field').style.display = tab === 'field' ? 'flex' : 'none';
+
+    updateStickyBarContent();
+    updateStickyBar();
+  }
+
+  /* ── Sticky bar ── */
+  function updateStickyBarContent() {
+    if (activeTab === 'gh') {
+      var c = GH_CROPS[activeGhCrop];
+      document.getElementById('sb-gh-crop').textContent     = c.label;
+      document.getElementById('sb-gh-dilution').textContent = '1:' + c.dilution;
+    } else {
+      var c = FIELD_CROPS[activeCrop];
+      var cropLabel = document.querySelector('[data-crop="' + activeCrop + '"]').textContent;
+      document.getElementById('sb-field-crop').textContent     = cropLabel;
+      document.getElementById('sb-field-rate').textContent     = c.rate + ' ' + c.unit;
+      document.getElementById('sb-field-dilution').textContent = '1:' + c.dilution;
+    }
+  }
+
+  function updateStickyBar() {
+    var firstCard = document.querySelector('.section.active .card');
+    if (!firstCard) return;
+    document.getElementById('sticky-bar').classList.toggle('visible', firstCard.getBoundingClientRect().bottom < 0);
+  }
+
+  document.addEventListener('scroll', updateStickyBar, { passive: true });
+  window.addEventListener('scroll',   updateStickyBar, { passive: true });
+
+  /* ── GH calculator ── */
+  function selectGhCrop(key) {
+    activeGhCrop = key;
+    var c = GH_CROPS[key];
+    document.querySelectorAll('[data-gh-crop]').forEach(function(b) {
+      b.classList.toggle('active', b.dataset.ghCrop === key);
+    });
+    document.getElementById('gh-ci-dilution').textContent = '1:' + c.dilution;
+    document.getElementById('gh-ci-conc').textContent     = fmt(100 / c.dilution, 1) + '% v/v';
+    updateStickyBarContent();
+    ghCalculate();
+  }
+
+  function ghCalculate() {
+    var tank = parseFloat(document.getElementById('gh-tank').value) || 0;
+    if (!tank) return;
+    var c       = GH_CROPS[activeGhCrop];
+    var skeepon = tank / c.dilution;
+    var water   = tank - skeepon;
+    var pct     = (skeepon / tank) * 100;
+    var barPct  = Math.max(2, Math.min(pct, 98));
+
+    document.getElementById('gh-out-skeepon').innerHTML = fmtGal(skeepon) + '<span class="small"> gal</span>';
+    document.getElementById('gh-out-water').innerHTML   = fmtGal(water)   + '<span class="small"> gal</span>';
+    document.getElementById('gh-out-tank').innerHTML    = fmtGal(tank)    + '<span class="small"> gal</span>';
+
+    document.getElementById('gh-bar-product').style.width        = barPct + '%';
+    document.getElementById('gh-legend-product-pct').textContent = fmt(pct, 1) + '%';
+    document.getElementById('gh-legend-water-pct').textContent   = fmt(100 - pct, 1) + '%';
+  }
+
+  function ghCopySummary() {
+    var c       = GH_CROPS[activeGhCrop];
+    var tank    = document.getElementById('gh-tank').value || '—';
+    var skeepon = document.getElementById('gh-out-skeepon').textContent.replace(/[^\d.,]/g, '') || '—';
+    var water   = document.getElementById('gh-out-water').textContent.replace(/[^\d.,]/g, '')   || '—';
+    var text    = 'Skeepon GH · ' + c.label + ' · ' + tank + ' gal tank → ' + skeepon + ' gal Skeepon GH + ' + water + ' gal water (1:' + c.dilution + ')';
+    navigator.clipboard.writeText(text).then(function() {
+      var btn = document.getElementById('gh-copy-btn');
+      btn.textContent = 'Copied!';
+      btn.classList.add('copied');
+      setTimeout(function() { btn.textContent = 'Copy mix summary'; btn.classList.remove('copied'); }, 2000);
+    });
+  }
+
+  /* ── Field calculator ── */
   function toggleAdvanced() {
     isAdvanced = !isAdvanced;
     document.getElementById('adv-card').classList.toggle('visible', isAdvanced);
@@ -549,19 +719,19 @@
   }
 
   function plantsPerAcre() {
-    const row    = parseFloat(document.getElementById('rowSpacing').value) || 1;
-    const within = parseFloat(document.getElementById('withinRow').value)  || 1;
+    var row    = parseFloat(document.getElementById('rowSpacing').value) || 1;
+    var within = parseFloat(document.getElementById('withinRow').value)  || 1;
     return SQFT_PER_ACRE / (row * within);
   }
 
   function effectiveRatePerAcre() {
-    const c = CROPS[activeCrop];
+    var c = FIELD_CROPS[activeCrop];
     return c.perPlant ? c.rate * plantsPerAcre() : c.rate;
   }
 
   function updateDensityPanel() {
-    const c = CROPS[activeCrop];
-    const panel = document.getElementById('density-panel');
+    var c = FIELD_CROPS[activeCrop];
+    var panel = document.getElementById('density-panel');
     if (!c.perPlant) { panel.classList.remove('visible'); return; }
     panel.classList.add('visible');
     document.getElementById('rowSpacing').value = c.rowSpacing;
@@ -570,61 +740,63 @@
   }
 
   function refreshDensityDisplay() {
-    const c = CROPS[activeCrop];
-    const density = plantsPerAcre();
-    const effRate = effectiveRatePerAcre();
+    var c       = FIELD_CROPS[activeCrop];
+    var density = plantsPerAcre();
+    var effRate = effectiveRatePerAcre();
     document.getElementById('density-value').textContent  = fmt(density, 0);
-    document.getElementById('density-unit').textContent   = `${c.plantLabel}/acre`;
-    document.getElementById('effective-rate').textContent = `→ ${fmt(effRate, 4)} gal/acre`;
+    document.getElementById('density-unit').textContent   = c.plantLabel + '/acre';
+    document.getElementById('effective-rate').textContent = '→ ' + fmt(effRate, 4) + ' gal/acre';
   }
 
   function selectCrop(key) {
     activeCrop = key;
-    const c = CROPS[key];
-    document.querySelectorAll('.crop-btn').forEach(b => b.classList.toggle('active', b.dataset.crop === key));
-    document.getElementById('ci-rate').textContent          = `${c.rate} ${c.unit}`;
-    document.getElementById('ci-rate-diluted').textContent  = `${fmt(c.rate * c.dilution, 0)} ${c.unit}`;
-    document.getElementById('ci-dilution').textContent      = `1:${c.dilution}`;
-    const cropLabel = document.querySelector(`.crop-btn[data-crop="${key}"]`).textContent;
-    document.getElementById('sb-crop').textContent     = cropLabel;
-    document.getElementById('sb-rate').textContent     = `${c.rate} ${c.unit}`;
-    document.getElementById('sb-diluted').textContent  = `${fmt(c.rate * c.dilution, 0)} ${c.unit}`;
-    document.getElementById('sb-dilution').textContent = `1:${c.dilution}`;
+    var c = FIELD_CROPS[key];
+    document.querySelectorAll('[data-crop]').forEach(function(b) {
+      b.classList.toggle('active', b.dataset.crop === key);
+    });
+    document.getElementById('ci-rate').textContent         = c.rate + ' ' + c.unit;
+    document.getElementById('ci-rate-diluted').textContent = fmt(c.rate * c.dilution, 0) + ' ' + c.unit;
+    document.getElementById('ci-dilution').textContent     = '1:' + c.dilution;
+    updateStickyBarContent();
     updateDensityPanel();
-    calculate();
+    fieldCalculate();
   }
 
   function selectInjRate(rate) {
-    const customWrap = document.getElementById('custom-inj-wrap');
+    var customWrap = document.getElementById('custom-inj-wrap');
     if (rate === 'custom') {
-      document.querySelectorAll('.inj-btn').forEach(b => b.classList.toggle('active', b.dataset.inj === 'custom'));
+      document.querySelectorAll('.inj-btn').forEach(function(b) {
+        b.classList.toggle('active', b.dataset.inj === 'custom');
+      });
       customWrap.classList.add('visible');
       document.getElementById('customInjRate').focus();
-      const val = parseFloat(document.getElementById('customInjRate').value);
-      if (val > 0) { activeInjRate = val; calculate(); }
+      var val = parseFloat(document.getElementById('customInjRate').value);
+      if (val > 0) { activeInjRate = val; fieldCalculate(); }
       return;
     }
     activeInjRate = rate;
     customWrap.classList.remove('visible');
-    document.querySelectorAll('.inj-btn').forEach(b => b.classList.toggle('active', +b.dataset.inj === rate));
-    calculate();
+    document.querySelectorAll('.inj-btn').forEach(function(b) {
+      b.classList.toggle('active', +b.dataset.inj === rate);
+    });
+    fieldCalculate();
   }
 
-  function calculate() {
-    const acres    = parseFloat(document.getElementById('acres').value)    || 0;
-    const flowRate = parseFloat(document.getElementById('flowRate').value) || 0;
-    const c        = CROPS[activeCrop];
-    const appRate  = effectiveRatePerAcre();
-    const injRate  = Math.min(activeInjRate, flowRate);
+  function fieldCalculate() {
+    var acres    = parseFloat(document.getElementById('acres').value)    || 0;
+    var flowRate = parseFloat(document.getElementById('flowRate').value) || 0;
+    var c        = FIELD_CROPS[activeCrop];
+    var appRate  = effectiveRatePerAcre();
+    var injRate  = Math.min(activeInjRate, flowRate);
 
-    document.querySelectorAll('.inj-btn').forEach(btn => {
+    document.querySelectorAll('.inj-btn').forEach(function(btn) {
       if (btn.dataset.inj === 'custom') return;
       btn.classList.toggle('over-flow', +btn.dataset.inj > flowRate);
     });
 
-    const warnEl = document.getElementById('inj-warn');
+    var warnEl = document.getElementById('inj-warn');
     if (activeInjRate > flowRate) {
-      warnEl.textContent = `Injection rate capped to ${injRate} gpm — cannot exceed flow rate of ${flowRate} gpm.`;
+      warnEl.textContent = 'Injection rate capped to ' + injRate + ' gpm — cannot exceed flow rate of ' + flowRate + ' gpm.';
       warnEl.classList.add('visible');
     } else {
       warnEl.classList.remove('visible');
@@ -632,15 +804,15 @@
 
     if (!acres || !flowRate) return;
 
-    const skeepon = acres * appRate;
-    const tankVol = skeepon * c.dilution * injRate / flowRate;
-    const water   = tankVol - skeepon;
-    const runTime = tankVol / injRate;
-    const skeePct = (skeepon / tankVol) * 100;
+    var skeepon = acres * appRate;
+    var tankVol = skeepon * c.dilution * injRate / flowRate;
+    var water   = tankVol - skeepon;
+    var runTime = tankVol / injRate;
+    var skeePct = (skeepon / tankVol) * 100;
 
-    const errorEl = document.getElementById('calc-error');
+    var errorEl = document.getElementById('calc-error');
     if (water < 0) {
-      errorEl.textContent = `Not possible — tank volume (${fmtGal(tankVol)} gal) is smaller than Skeepon needed (${fmtGal(skeepon)} gal). Increase injector rate or reduce flow rate.`;
+      errorEl.textContent = 'Not possible — tank volume (' + fmtGal(tankVol) + ' gal) is smaller than Skeepon needed (' + fmtGal(skeepon) + ' gal). Increase injector rate or reduce flow rate.';
       errorEl.classList.add('visible');
       return;
     }
@@ -651,71 +823,73 @@
     document.getElementById('out-tank').innerHTML    = fmtGal(tankVol) + '<span class="small"> gal</span>';
     document.getElementById('out-time').innerHTML    = fmt(runTime)     + '<span class="small"> min</span>';
 
-    const waterPct = 100 - skeePct;
-    const barPct   = Math.max(2, Math.min(skeePct, 98));
+    var waterPct = 100 - skeePct;
+    var barPct   = Math.max(2, Math.min(skeePct, 98));
     document.getElementById('bar-skeepon').style.width        = barPct + '%';
     document.getElementById('legend-skeepon-pct').textContent = fmt(skeePct, 1) + '%';
     document.getElementById('legend-water-pct').textContent   = fmt(waterPct, 1) + '%';
 
-    const fieldConc    = (skeepon / tankVol) * (injRate / flowRate);
-    const targetDil    = c.dilution;
-    const actualDil    = Math.round(1 / fieldConc);
-    document.getElementById('adv-target').textContent = `1:${targetDil}`;
-    document.getElementById('adv-actual').textContent = `1:${actualDil}`;
+    var fieldConc = (skeepon / tankVol) * (injRate / flowRate);
+    var actualDil = Math.round(1 / fieldConc);
+    document.getElementById('adv-target').textContent = '1:' + c.dilution;
+    document.getElementById('adv-actual').textContent = '1:' + actualDil;
     document.getElementById('adv-note').textContent   =
-      `${injRate} gpm injector into ${fmt(flowRate, 0)} gpm mainline · ${fmtGal(skeepon)} gal Skeepon in ${fmtGal(tankVol)} gal tank`;
+      injRate + ' gpm injector into ' + fmt(flowRate, 0) + ' gpm mainline · ' + fmtGal(skeepon) + ' gal Skeepon in ' + fmtGal(tankVol) + ' gal tank';
   }
 
-  function fmt(n, dec = 1) {
-    return Number(n.toFixed(dec)).toLocaleString();
-  }
-
-  function fmtGal(n) {
-    const rounded = Math.ceil(n * 2) / 2;
-    return Number(rounded.toFixed(1)).toLocaleString();
-  }
-
-  document.querySelectorAll('.crop-btn').forEach(btn =>
-    btn.addEventListener('click', () => selectCrop(btn.dataset.crop))
-  );
-  document.querySelectorAll('.inj-btn').forEach(btn =>
-    btn.addEventListener('click', () => selectInjRate(btn.dataset.inj === 'custom' ? 'custom' : +btn.dataset.inj))
-  );
-  document.getElementById('customInjRate').addEventListener('input', () => {
-    const val = parseFloat(document.getElementById('customInjRate').value);
-    if (val > 0) { activeInjRate = val; calculate(); }
-  });
-  document.getElementById('rowSpacing').addEventListener('input', () => { refreshDensityDisplay(); calculate(); });
-  document.getElementById('withinRow').addEventListener('input',  () => { refreshDensityDisplay(); calculate(); });
-  document.querySelectorAll('#acres, #flowRate').forEach(el => el.addEventListener('input', calculate));
-
-  // Sticky bar — appears when the crop card leaves the viewport
-  const stickyBar = document.getElementById('sticky-bar');
-  const cropCard  = document.querySelector('.card');
-  function updateStickyBar() {
-    stickyBar.classList.toggle('visible', cropCard.getBoundingClientRect().bottom < 0);
-  }
-  document.addEventListener('scroll', updateStickyBar, { passive: true });
-  window.addEventListener('scroll', updateStickyBar, { passive: true });
-  updateStickyBar();
-
-  function copySummary() {
-    const crop    = document.getElementById('sb-crop').textContent;
-    const acres   = document.getElementById('acres').value || '—';
-    const flow    = document.getElementById('flowRate').value || '—';
-    const skeepon = document.getElementById('out-skeepon').textContent.replace(/[^\d.,]/g, '') || '—';
-    const water   = document.getElementById('out-water').textContent.replace(/[^\d.,]/g, '')   || '—';
-    const time    = document.getElementById('out-time').textContent.replace(/[^\d.,]/g, '')     || '—';
-    const text    = `${acres} ac · ${crop} · ${flow} gpm flow · ${activeInjRate} gpm injector → ${skeepon} gal Skeepon + ${water} gal water · ${time} min run`;
-    navigator.clipboard.writeText(text).then(() => {
-      const btn = document.getElementById('copy-btn');
+  function fieldCopySummary() {
+    var cropLabel = document.querySelector('[data-crop="' + activeCrop + '"]').textContent;
+    var acres     = document.getElementById('acres').value || '—';
+    var flow      = document.getElementById('flowRate').value || '—';
+    var skeepon   = document.getElementById('out-skeepon').textContent.replace(/[^\d.,]/g, '') || '—';
+    var water     = document.getElementById('out-water').textContent.replace(/[^\d.,]/g, '')   || '—';
+    var time      = document.getElementById('out-time').textContent.replace(/[^\d.,]/g, '')     || '—';
+    var text      = acres + ' ac · ' + cropLabel + ' · ' + flow + ' gpm flow · ' + activeInjRate + ' gpm injector → ' + skeepon + ' gal Skeepon Field + ' + water + ' gal water · ' + time + ' min run';
+    navigator.clipboard.writeText(text).then(function() {
+      var btn = document.getElementById('copy-btn');
       btn.textContent = 'Copied!';
       btn.classList.add('copied');
-      setTimeout(() => { btn.textContent = 'Copy mix summary'; btn.classList.remove('copied'); }, 2000);
+      setTimeout(function() { btn.textContent = 'Copy mix summary'; btn.classList.remove('copied'); }, 2000);
     });
   }
 
+  /* ── Formatting ── */
+  function fmt(n, dec) {
+    dec = (dec === undefined) ? 1 : dec;
+    return Number(n.toFixed(dec)).toLocaleString();
+  }
+  function fmtGal(n) {
+    var rounded = Math.ceil(n * 2) / 2;
+    return Number(rounded.toFixed(1)).toLocaleString();
+  }
+
+  /* ── Event listeners ── */
+  document.querySelectorAll('[data-crop]').forEach(function(btn) {
+    btn.addEventListener('click', function() { selectCrop(btn.dataset.crop); });
+  });
+  document.querySelectorAll('[data-gh-crop]').forEach(function(btn) {
+    btn.addEventListener('click', function() { selectGhCrop(btn.dataset.ghCrop); });
+  });
+  document.querySelectorAll('.inj-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      selectInjRate(btn.dataset.inj === 'custom' ? 'custom' : +btn.dataset.inj);
+    });
+  });
+  document.getElementById('customInjRate').addEventListener('input', function() {
+    var val = parseFloat(document.getElementById('customInjRate').value);
+    if (val > 0) { activeInjRate = val; fieldCalculate(); }
+  });
+  document.getElementById('rowSpacing').addEventListener('input', function() { refreshDensityDisplay(); fieldCalculate(); });
+  document.getElementById('withinRow').addEventListener('input',  function() { refreshDensityDisplay(); fieldCalculate(); });
+  document.getElementById('acres').addEventListener('input', fieldCalculate);
+  document.getElementById('flowRate').addEventListener('input', fieldCalculate);
+  document.getElementById('gh-tank').addEventListener('input', ghCalculate);
+
+  /* ── Init ── */
   selectCrop('tomato');
+  selectGhCrop('tomato-gh');
+  ghCalculate();
+  updateStickyBar();
 </script>
 </body>
 </html>
