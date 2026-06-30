@@ -419,12 +419,12 @@
 <body>
 
 <!-- Sticky bar — content swaps per active tab -->
-<div class="sticky-bar gh-bar" id="sticky-bar">
-  <div id="sb-gh" style="display:flex;align-items:center;gap:20px;flex-wrap:wrap;">
+<div class="sticky-bar field-bar" id="sticky-bar">
+  <div id="sb-gh" style="display:none;align-items:center;gap:20px;flex-wrap:wrap;">
     <span><span class="ci-label" id="sb-gh-label1">Crop</span>&nbsp;<span class="ci-value" id="sb-gh-crop">Tomato (Greenhouse)</span></span>
     <span><span class="ci-label">Dilution</span>&nbsp;<span class="ci-value" id="sb-gh-dilution">1:50</span></span>
   </div>
-  <div id="sb-field" style="display:none;align-items:center;gap:20px;flex-wrap:wrap;">
+  <div id="sb-field" style="display:flex;align-items:center;gap:20px;flex-wrap:wrap;">
     <span><span class="ci-label">Crop</span>&nbsp;<span class="ci-value" id="sb-field-crop">Tomato (Processing)</span></span>
     <span><span class="ci-label">Rate</span>&nbsp;<span class="ci-value" id="sb-field-rate">1 gal/acre</span></span>
     <span><span class="ci-label">Dilution</span>&nbsp;<span class="ci-value" id="sb-field-dilution">1:250</span></span>
@@ -443,11 +443,11 @@
 
   <!-- Tab nav -->
   <div class="tab-nav">
-    <button class="tab-btn gh-tab active" id="tab-gh" onclick="switchTab('gh')">
+    <button class="tab-btn gh-tab" id="tab-gh" onclick="switchTab('gh')">
       Skeepon Greenhouse
       <span class="tab-label">Drip / EC-controlled</span>
     </button>
-    <button class="tab-btn field-tab" id="tab-field" onclick="switchTab('field')">
+    <button class="tab-btn field-tab active" id="tab-field" onclick="switchTab('field')">
       Skeepon Field
       <span class="tab-label">Open-field fertigation</span>
     </button>
@@ -457,7 +457,7 @@
   <!-- ════════════════════════════════════════
        GREENHOUSE SECTION
   ════════════════════════════════════════ -->
-  <div class="section gh-theme active" id="section-gh">
+  <div class="section gh-theme" id="section-gh">
 
     <!-- 1. Crop selection — always visible -->
     <div class="card">
@@ -583,7 +583,7 @@
   <!-- ════════════════════════════════════════
        FIELD SECTION
   ════════════════════════════════════════ -->
-  <div class="section field-theme" id="section-field">
+  <div class="section field-theme active" id="section-field">
 
     <!-- Crop selection -->
     <div class="card">
@@ -741,7 +741,7 @@
 
   const SQFT_PER_ACRE = 43560;
 
-  var activeTab     = 'gh';
+  var activeTab     = 'field';
   var activeCrop    = 'tomato';
   var activeGhCrop  = 'tomato-gh';
   var activeInjRate = 20;
