@@ -327,6 +327,10 @@
       font-size: 0.82rem; color: #5a6a5a; margin-top: 14px;
       padding-top: 12px; border-top: 1px solid #e0ece0; line-height: 1.5;
     }
+    /* dosatron instruction card */
+    .dr-instruction { border-left: 4px solid #2e7d32; }
+    .dr-instruction .dr-title { color: #1a4d1a; }
+    .dr-instruction .dr-body  { color: #3a5a3a; }
     /* perfect */
     #dr-perfect { border-left: 4px solid #2e7d32; }
     #dr-perfect .dr-title { color: #1a4d1a; }
@@ -454,83 +458,43 @@
   ════════════════════════════════════════ -->
   <div class="section gh-theme active" id="section-gh">
 
-    <!-- Application mode toggle -->
+    <!-- 1. Crop selection — always visible -->
+    <div class="card">
+      <h2>Crop</h2>
+      <div class="crop-grid">
+        <button class="crop-btn active" data-gh-crop="tomato-gh">Tomato (Greenhouse)</button>
+        <button class="crop-btn" data-gh-crop="peppers-gh">Peppers (Greenhouse)</button>
+      </div>
+      <div class="crop-info">
+        <span><span class="ci-label">Product</span>&nbsp;<span class="ci-value">Skeepon Greenhouse</span></span>
+        <span><span class="ci-label">Dilution</span>&nbsp;<span class="ci-value" id="gh-ci-dilution">1:50</span></span>
+        <span><span class="ci-label">Concentration</span>&nbsp;<span class="ci-value" id="gh-ci-conc">2.0% v/v</span></span>
+      </div>
+    </div>
+
+    <!-- 2. Application mode toggle -->
     <div class="gh-mode-nav">
       <button class="gh-mode-btn active" id="ghmode-dosatron" onclick="switchGhMode('dosatron')">
-        Using a Dosatron
-        <span class="gh-mode-sub">Proportional injector (most setups)</span>
+        With Dosatron
+        <span class="gh-mode-sub">Proportional injector</span>
       </button>
       <button class="gh-mode-btn" id="ghmode-manual" onclick="switchGhMode('manual')">
-        No Dosatron
-        <span class="gh-mode-sub">Manual tank mix</span>
+        Without Dosatron
+        <span class="gh-mode-sub">Manual mix</span>
       </button>
     </div>
 
-    <!-- ─── Dosatron path ─── -->
+    <!-- ─── With Dosatron ─── -->
     <div id="gh-dosatron-section">
-
-      <div class="card">
-        <h2>Dosatron Ratio</h2>
-        <p class="dosatron-hint">Enter the ratio your Dosatron is set to (shown on the dial). Target for Skeepon GH is <strong>1:50</strong> (2% v/v).</p>
-        <div class="dosatron-ratio-row">
-          <span class="ratio-prefix">1 :</span>
-          <div class="hero-wrap dosatron-input-wrap">
-            <input type="number" id="gh-ratio" value="50" min="1" step="1" placeholder="50">
-          </div>
-        </div>
-      </div>
-
-      <!-- State: perfect match -->
-      <div class="card dr-card" id="dr-perfect">
+      <div class="card dr-instruction">
         <div class="dr-icon dr-ok-icon">✓</div>
-        <div class="dr-title">You're all set</div>
-        <div class="dr-body">Your Dosatron at <strong>1:50</strong> delivers exactly 2% v/v. Fill the reservoir with pure Skeepon GH — no dilution needed.</div>
+        <div class="dr-title">Set Dosatron to 1:50 (2% v/v)</div>
+        <div class="dr-body">Fill the Dosatron reservoir with pure Skeepon GH and set the injection ratio to <strong>1:50</strong>. No additional mixing needed.</div>
       </div>
+    </div>
 
-      <!-- State: too fast — dilute the stock -->
-      <div class="card dr-card" id="dr-fast">
-        <h2>Dilute Your Dosatron Stock</h2>
-        <p class="dr-intro">At <strong>1:<span id="dr-ratio-fast">—</span></strong>, your Dosatron injects more than 2% v/v with a pure stock. Mix a diluted stock for the reservoir:</p>
-        <div class="result-grid" style="margin-top:16px;">
-          <div class="result-item highlight">
-            <div class="label">Skeepon GH</div>
-            <div class="value" id="dr-oz-skeepon">—<span class="small">fl oz</span></div>
-            <div class="dr-per-label">per quart of stock</div>
-          </div>
-          <div class="result-item">
-            <div class="label">Water</div>
-            <div class="value" id="dr-oz-water">—<span class="small">fl oz</span></div>
-            <div class="dr-per-label">per quart of stock</div>
-          </div>
-        </div>
-        <p class="dr-stock-note">Stock concentration: <strong id="dr-stock-pct">—</strong>% Skeepon · pour Skeepon first, then fill reservoir to the 1-quart mark with water</p>
-      </div>
-
-      <!-- State: too slow — contact Ac-Planta -->
-      <div class="card dr-card" id="dr-slow">
-        <div class="dr-icon dr-warn-icon">!</div>
-        <div class="dr-title">Contact Ac-Planta</div>
-        <div class="dr-body">At <strong>1:<span id="dr-ratio-slow">—</span></strong>, your Dosatron cannot reach 2% v/v even with pure Skeepon. Please contact Ac-Planta for configuration support.</div>
-      </div>
-
-    </div><!-- /gh-dosatron-section -->
-
-    <!-- ─── Manual path ─── -->
+    <!-- ─── Without Dosatron ─── -->
     <div id="gh-manual-section" style="display:none">
-
-      <!-- Crop selection -->
-      <div class="card">
-        <h2>Crop</h2>
-        <div class="crop-grid">
-          <button class="crop-btn active" data-gh-crop="tomato-gh">Tomato (Greenhouse)</button>
-          <button class="crop-btn" data-gh-crop="peppers-gh">Peppers (Greenhouse)</button>
-        </div>
-        <div class="crop-info">
-          <span><span class="ci-label">Product</span>&nbsp;<span class="ci-value">Skeepon Greenhouse</span></span>
-          <span><span class="ci-label">Dilution</span>&nbsp;<span class="ci-value" id="gh-ci-dilution">1:50</span></span>
-          <span><span class="ci-label">Concentration</span>&nbsp;<span class="ci-value" id="gh-ci-conc">2.0% v/v</span></span>
-        </div>
-      </div>
 
       <!-- Tank size -->
       <div class="card">
@@ -777,17 +741,10 @@
   /* ── Sticky bar ── */
   function updateStickyBarContent() {
     if (activeTab === 'gh') {
-      if (ghMode === 'dosatron') {
-        var x = document.getElementById('gh-ratio').value || '—';
-        document.getElementById('sb-gh-label1').textContent  = 'Mode';
-        document.getElementById('sb-gh-crop').textContent    = 'Dosatron';
-        document.getElementById('sb-gh-dilution').textContent = '1:' + x;
-      } else {
-        var c = GH_CROPS[activeGhCrop];
-        document.getElementById('sb-gh-label1').textContent  = 'Crop';
-        document.getElementById('sb-gh-crop').textContent    = c.label;
-        document.getElementById('sb-gh-dilution').textContent = '1:' + c.dilution;
-      }
+      var c = GH_CROPS[activeGhCrop];
+      document.getElementById('sb-gh-label1').textContent   = 'Crop';
+      document.getElementById('sb-gh-crop').textContent     = c.label;
+      document.getElementById('sb-gh-dilution').textContent = '1:' + c.dilution;
     } else {
       var c = FIELD_CROPS[activeCrop];
       var cropLabel = document.querySelector('[data-crop="' + activeCrop + '"]').textContent;
@@ -849,38 +806,6 @@
       btn.classList.add('copied');
       setTimeout(function() { btn.textContent = 'Copy mix summary'; btn.classList.remove('copied'); }, 2000);
     });
-  }
-
-  /* ── Dosatron calculator ── */
-  function dosatronCalculate() {
-    var x = parseFloat(document.getElementById('gh-ratio').value) || 0;
-
-    ['dr-perfect', 'dr-fast', 'dr-slow'].forEach(function(id) {
-      document.getElementById(id).classList.remove('visible');
-    });
-
-    if (!x) return;
-
-    if (x === 50) {
-      document.getElementById('dr-perfect').classList.add('visible');
-    } else if (x < 50) {
-      // Dosatron injects too much — dilute stock so final = 2%
-      // stockConc = x / 50  (fraction of Skeepon in reservoir)
-      var stockConc = x / 50;
-      var ozSkeepon = stockConc * 32;   // per 32 fl oz (1 qt) of stock
-      var ozWater   = 32 - ozSkeepon;
-      document.getElementById('dr-ratio-fast').textContent    = x;
-      document.getElementById('dr-oz-skeepon').innerHTML      = fmt(ozSkeepon, 1) + '<span class="small"> fl oz</span>';
-      document.getElementById('dr-oz-water').innerHTML        = fmt(ozWater, 1)   + '<span class="small"> fl oz</span>';
-      document.getElementById('dr-stock-pct').textContent     = fmt(stockConc * 100, 1);
-      document.getElementById('dr-fast').classList.add('visible');
-    } else {
-      // Dosatron injects too little — can't reach 2% even with pure Skeepon
-      document.getElementById('dr-ratio-slow').textContent = x;
-      document.getElementById('dr-slow').classList.add('visible');
-    }
-
-    updateStickyBarContent();
   }
 
   /* ── Field calculator ── */
@@ -1056,14 +981,12 @@
   document.getElementById('acres').addEventListener('input', fieldCalculate);
   document.getElementById('flowRate').addEventListener('input', fieldCalculate);
   document.getElementById('gh-tank').addEventListener('input', ghCalculate);
-  document.getElementById('gh-ratio').addEventListener('input', dosatronCalculate);
 
   /* ── Init ── */
   selectCrop('tomato');
   selectGhCrop('tomato-gh');
   ghCalculate();
   switchGhMode('dosatron');
-  dosatronCalculate();
   updateStickyBar();
 </script>
 </body>
