@@ -520,27 +520,18 @@
 
       <!-- Results -->
       <div class="card">
-        <h2>Injection Tank Ratio</h2>
-        <div class="error-note" id="gh-nodat-error"></div>
+        <h2>Injection Ratio</h2>
         <div class="result-grid">
-          <div class="result-item highlight">
-            <div class="label">Skeepon GH</div>
-            <div class="value" id="gh-out-skeepon">—<span class="small">gpm</span></div>
+          <div class="result-item highlight full-width">
+            <div class="label">Skeepon GH : Water</div>
+            <div class="value">1 : <span id="gh-ratio-out">—</span></div>
           </div>
-          <div class="result-item">
-            <div class="label">Water</div>
-            <div class="value" id="gh-out-water">—<span class="small">gpm</span></div>
+          <div class="result-item full-width">
+            <div class="label">Approximate concentration</div>
+            <div class="value" id="gh-conc-out">—<span class="small">% v/v</span></div>
           </div>
         </div>
-        <div class="tank-bar">
-          <div class="seg-product" id="gh-bar-product" style="width:5%"></div>
-          <div class="seg-filler" id="gh-bar-filler"></div>
-        </div>
-        <div class="legend">
-          <span><span class="dot" style="background:#2e7d32"></span>Skeepon GH&nbsp;<strong id="gh-legend-product-pct">—</strong></span>
-          <span><span class="dot" style="background:#81c784"></span>Water&nbsp;<strong id="gh-legend-water-pct">—</strong></span>
-        </div>
-        <p class="gh-mix-note">Delivers 2.0% v/v Skeepon into <strong id="gh-out-total">—</strong> gpm total output</p>
+        <p class="gh-mix-note">Fill injection tank with <strong>pure Skeepon GH</strong>. The pump delivers 1 part Skeepon for every <strong><span id="gh-ratio-text">—</span> parts</strong> of main line water.</p>
         <button class="copy-btn" id="gh-copy-btn" onclick="ghCopySummary()">Copy mix summary</button>
       </div>
 
@@ -787,39 +778,21 @@
     var I = parseFloat(document.getElementById('gh-injrate').value)  || 0;
     if (!F || !I) return;
 
-    var errorEl    = document.getElementById('gh-nodat-error');
-    var skeeponGpm = 0.02 * (F + I);   // gpm of Skeepon needed for 2% v/v in total output
+    var ratio = F / I;
+    var conc  = (I / F) * 100;
 
-    if (skeeponGpm > I) {
-      var minInj  = (0.02 * F) / 0.98;
-      var maxConc = (I / (F + I)) * 100;
-      errorEl.innerHTML = 'Injection rate too low for 2% v/v. Minimum needed: <strong>' +
-        fmt(minInj, 1) + ' gpm</strong>. At ' + fmt(I, 1) + ' gpm, max concentration is ' +
-        fmt(maxConc, 2) + '%.';
-      errorEl.classList.add('visible');
-      return;
-    }
-    errorEl.classList.remove('visible');
-
-    var waterGpm = I - skeeponGpm;
-    var skeePct  = (skeeponGpm / I) * 100;
-    var barPct   = Math.max(2, Math.min(skeePct, 98));
-
-    document.getElementById('gh-out-skeepon').innerHTML          = fmt(skeeponGpm, 2) + '<span class="small"> gpm</span>';
-    document.getElementById('gh-out-water').innerHTML            = fmt(waterGpm, 2)   + '<span class="small"> gpm</span>';
-    document.getElementById('gh-bar-product').style.width        = barPct + '%';
-    document.getElementById('gh-legend-product-pct').textContent = fmt(skeePct, 1) + '%';
-    document.getElementById('gh-legend-water-pct').textContent   = fmt(100 - skeePct, 1) + '%';
-    document.getElementById('gh-out-total').textContent          = fmt(F + I, 0);
+    document.getElementById('gh-ratio-out').textContent  = fmt(ratio, 1);
+    document.getElementById('gh-ratio-text').textContent = fmt(ratio, 1);
+    document.getElementById('gh-conc-out').innerHTML     = fmt(conc, 1) + '<span class="small">% v/v</span>';
   }
 
   function ghCopySummary() {
-    var c       = GH_CROPS[activeGhCrop];
-    var F       = document.getElementById('gh-flowrate').value || '—';
-    var I       = document.getElementById('gh-injrate').value  || '—';
-    var skeepon = document.getElementById('gh-out-skeepon').textContent.replace(/[^\d.,]/g, '') || '—';
-    var water   = document.getElementById('gh-out-water').textContent.replace(/[^\d.,]/g, '')   || '—';
-    var text    = 'Skeepon GH · ' + c.label + ' · ' + F + ' gpm main / ' + I + ' gpm injection → ' + skeepon + ' gpm Skeepon GH + ' + water + ' gpm water (2% v/v)';
+    var c     = GH_CROPS[activeGhCrop];
+    var F     = document.getElementById('gh-flowrate').value || '—';
+    var I     = document.getElementById('gh-injrate').value  || '—';
+    var ratio = document.getElementById('gh-ratio-out').textContent || '—';
+    var conc  = document.getElementById('gh-conc-out').textContent.replace(/[^\d.%]/g, '') || '—';
+    var text  = 'Skeepon GH · ' + c.label + ' · ' + F + ' gpm main / ' + I + ' gpm injection → 1:' + ratio + ' (' + conc + ')';
     navigator.clipboard.writeText(text).then(function() {
       var btn = document.getElementById('gh-copy-btn');
       btn.textContent = 'Copied!';
