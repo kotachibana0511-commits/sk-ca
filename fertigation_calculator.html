@@ -1005,6 +1005,7 @@
   selectGhCrop('tomato-gh');
   ghCalculate();
   switchGhMode('dosatron');
+  if (new URLSearchParams(window.location.search).get('tab') === 'gh') switchTab('gh');
   updateStickyBar();
 </script>
 </body>
