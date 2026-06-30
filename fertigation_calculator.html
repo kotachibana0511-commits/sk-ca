@@ -497,10 +497,10 @@
     <!-- ─── Without Dosatron ─── -->
     <div id="gh-manual-section" style="display:none">
 
-      <!-- Main line flow rate -->
+      <!-- Flow rates -->
       <div class="card">
-        <h2>Main Line Flow Rate</h2>
-        <div class="hero-grid single">
+        <h2>Flow Rates</h2>
+        <div class="hero-grid">
           <div class="hero-field">
             <label>Main Line</label>
             <div class="hero-wrap">
@@ -508,13 +508,6 @@
               <span class="unit">gpm</span>
             </div>
           </div>
-        </div>
-      </div>
-
-      <!-- Injection rate -->
-      <div class="card">
-        <h2>Injection Rate</h2>
-        <div class="hero-grid single">
           <div class="hero-field">
             <label>Injection Rate</label>
             <div class="hero-wrap">
@@ -556,21 +549,6 @@
             <span><span class="dot" style="background:#81c784"></span>Water&nbsp;<strong id="gh-legend-water-pct">—</strong></span>
           </div>
           <p class="gh-mix-note" style="margin-top:12px;">Per quart of stock: <strong id="gh-dil-oz-sk">—</strong> fl oz Skeepon GH + <strong id="gh-dil-oz-w">—</strong> fl oz water</p>
-        </div>
-      </div>
-
-      <!-- Injection ratio -->
-      <div class="card">
-        <h2>Injection Ratio</h2>
-        <div class="result-grid">
-          <div class="result-item highlight full-width">
-            <div class="label">Greenhouse Dilution</div>
-            <div class="value">1:50</div>
-          </div>
-          <div class="result-item full-width">
-            <div class="label">Concentration</div>
-            <div class="value">2.0<span class="small">% v/v</span></div>
-          </div>
         </div>
         <button class="copy-btn" id="gh-copy-btn" onclick="ghCopySummary()">Copy mix summary</button>
       </div>
@@ -700,13 +678,8 @@
       <button class="copy-btn" id="copy-btn" onclick="fieldCopySummary()">Copy mix summary</button>
     </div>
 
-    <!-- Advanced toggle -->
-    <div class="adv-toggle-wrap">
-      <button class="adv-toggle" id="adv-toggle" onclick="toggleAdvanced()">Show advanced ▼</button>
-    </div>
-
-    <!-- Advanced: dilution check -->
-    <div class="card adv-card" id="adv-card">
+    <!-- Dilution check -->
+    <div class="card" id="adv-card">
       <h2>Dilution Check</h2>
       <div class="result-grid">
         <div class="result-item">
@@ -745,7 +718,6 @@
   var activeCrop    = 'tomato';
   var activeGhCrop  = 'tomato-gh';
   var activeInjRate = 20;
-  var isAdvanced    = false;
   var ghMode        = 'dosatron';
 
   /* ── GH mode switching ── */
@@ -842,16 +814,15 @@
   }
 
   function ghCopySummary() {
-    var c     = GH_CROPS[activeGhCrop];
-    var F     = document.getElementById('gh-flowrate').value || '—';
-    var I     = document.getElementById('gh-injrate').value  || '—';
-    var conc  = document.getElementById('gh-conc-out').textContent.replace(/[^\d.]/g, '') || '—';
-    var needsDilution = parseFloat(conc) >= 2.2;
+    var c    = GH_CROPS[activeGhCrop];
+    var F    = parseFloat(document.getElementById('gh-flowrate').value) || 0;
+    var I    = parseFloat(document.getElementById('gh-injrate').value)  || 0;
+    var needsDilution = F && I && ((I / F) * 100 >= 2.2);
     var detail = needsDilution
       ? (document.getElementById('gh-dil-skeepon').textContent.replace(/[^\d.]/g, '') + ' gpm Skeepon + ' +
          document.getElementById('gh-dil-water').textContent.replace(/[^\d.]/g, '') + ' gpm water in tank')
       : 'pure Skeepon in tank';
-    var text = 'Skeepon GH · ' + c.label + ' · ' + F + ' gpm main / ' + I + ' gpm injection · 1:50 (' + conc + '% v/v) · ' + detail;
+    var text = 'Skeepon GH · ' + c.label + ' · ' + (F||'—') + ' gpm main / ' + (I||'—') + ' gpm injection · 1:50 (2.0% v/v) · ' + detail;
     navigator.clipboard.writeText(text).then(function() {
       var btn = document.getElementById('gh-copy-btn');
       btn.textContent = 'Copied!';
@@ -861,12 +832,6 @@
   }
 
   /* ── Field calculator ── */
-  function toggleAdvanced() {
-    isAdvanced = !isAdvanced;
-    document.getElementById('adv-card').classList.toggle('visible', isAdvanced);
-    document.getElementById('adv-toggle').textContent = isAdvanced ? 'Hide advanced ▲' : 'Show advanced ▼';
-  }
-
   function plantsPerAcre() {
     var row    = parseFloat(document.getElementById('rowSpacing').value) || 1;
     var within = parseFloat(document.getElementById('withinRow').value)  || 1;
