@@ -497,10 +497,10 @@
     <!-- ─── Without Dosatron ─── -->
     <div id="gh-manual-section" style="display:none">
 
-      <!-- Flow rates -->
+      <!-- Main line flow rate -->
       <div class="card">
-        <h2>Flow Rates</h2>
-        <div class="hero-grid">
+        <h2>Main Line Flow Rate</h2>
+        <div class="hero-grid single">
           <div class="hero-field">
             <label>Main Line</label>
             <div class="hero-wrap">
@@ -508,6 +508,13 @@
               <span class="unit">gpm</span>
             </div>
           </div>
+        </div>
+      </div>
+
+      <!-- Injection rate -->
+      <div class="card">
+        <h2>Injection Rate</h2>
+        <div class="hero-grid single">
           <div class="hero-field">
             <label>Injection Rate</label>
             <div class="hero-wrap">
@@ -523,8 +530,8 @@
         <h2>Injection Ratio</h2>
         <div class="result-grid">
           <div class="result-item highlight full-width">
-            <div class="label">Field Dilution</div>
-            <div class="value">1 : <span id="gh-ratio-out">—</span></div>
+            <div class="label">Greenhouse Dilution</div>
+            <div class="value">1:50</div>
           </div>
           <div class="result-item full-width">
             <div class="label">Concentration</div>
@@ -533,7 +540,7 @@
         </div>
 
         <!-- Pure Skeepon (conc < 2.2%) -->
-        <p class="gh-mix-note" id="gh-pure-note">Fill injection tank with <strong>pure Skeepon GH</strong>. The pump delivers 1 part Skeepon for every <strong><span id="gh-ratio-text">—</span> parts</strong> of main line water.</p>
+        <p class="gh-mix-note" id="gh-pure-note">Fill injection tank with <strong>pure Skeepon GH</strong>. At these flow rates the pump delivers approx. <strong>1:50 (2% v/v)</strong> Skeepon.</p>
 
         <!-- Dilution needed (conc ≥ 2.2%) -->
         <div id="gh-dilution-panel" style="display:none">
@@ -805,12 +812,8 @@
     var I = parseFloat(document.getElementById('gh-injrate').value)  || 0;
     if (!F || !I) return;
 
-    var ratio = F / I;
-    var conc  = (I / F) * 100;
-
-    document.getElementById('gh-ratio-out').textContent  = fmt(ratio, 1);
-    document.getElementById('gh-ratio-text').textContent = fmt(ratio, 1);
-    document.getElementById('gh-conc-out').innerHTML     = fmt(conc, 1) + '<span class="small">% v/v</span>';
+    var conc = (I / F) * 100;
+    document.getElementById('gh-conc-out').innerHTML = fmt(conc, 1) + '<span class="small">% v/v</span>';
 
     var needsDilution = conc >= 2.2;
     document.getElementById('gh-pure-note').style.display      = needsDilution ? 'none'  : 'block';
@@ -838,14 +841,13 @@
     var c     = GH_CROPS[activeGhCrop];
     var F     = document.getElementById('gh-flowrate').value || '—';
     var I     = document.getElementById('gh-injrate').value  || '—';
-    var ratio = document.getElementById('gh-ratio-out').textContent || '—';
     var conc  = document.getElementById('gh-conc-out').textContent.replace(/[^\d.]/g, '') || '—';
     var needsDilution = parseFloat(conc) >= 2.2;
     var detail = needsDilution
       ? (document.getElementById('gh-dil-skeepon').textContent.replace(/[^\d.]/g, '') + ' gpm Skeepon + ' +
          document.getElementById('gh-dil-water').textContent.replace(/[^\d.]/g, '') + ' gpm water in tank')
       : 'pure Skeepon in tank';
-    var text = 'Skeepon GH · ' + c.label + ' · ' + F + ' gpm main / ' + I + ' gpm injection · 1:' + ratio + ' (' + conc + '% v/v) · ' + detail;
+    var text = 'Skeepon GH · ' + c.label + ' · ' + F + ' gpm main / ' + I + ' gpm injection · 1:50 (' + conc + '% v/v) · ' + detail;
     navigator.clipboard.writeText(text).then(function() {
       var btn = document.getElementById('gh-copy-btn');
       btn.textContent = 'Copied!';
