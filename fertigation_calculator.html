@@ -327,6 +327,7 @@
       font-size: 0.82rem; color: #5a6a5a; margin-top: 14px;
       padding-top: 12px; border-top: 1px solid #e0ece0; line-height: 1.5;
     }
+    .gh-mix-note { font-size: 0.84rem; color: #4a6e4a; margin-top: 14px; line-height: 1.5; }
     /* dosatron instruction card */
     .dr-instruction { border-left: 4px solid #2e7d32; }
     .dr-instruction .dr-title { color: #1a4d1a; }
@@ -496,15 +497,22 @@
     <!-- ─── Without Dosatron ─── -->
     <div id="gh-manual-section" style="display:none">
 
-      <!-- Tank size -->
+      <!-- Flow rates -->
       <div class="card">
-        <h2>Tank Size</h2>
-        <div class="hero-grid single">
+        <h2>Flow Rates</h2>
+        <div class="hero-grid">
           <div class="hero-field">
-            <label>Tank Volume</label>
+            <label>Main Line</label>
             <div class="hero-wrap">
-              <input type="number" id="gh-tank" value="500" min="10" step="10" placeholder="e.g. 500">
-              <span class="unit">gal</span>
+              <input type="number" id="gh-flowrate" value="100" min="1" step="1" placeholder="100">
+              <span class="unit">gpm</span>
+            </div>
+          </div>
+          <div class="hero-field">
+            <label>Injection Rate</label>
+            <div class="hero-wrap">
+              <input type="number" id="gh-injrate" value="2" min="0.1" step="0.1" placeholder="2">
+              <span class="unit">gpm</span>
             </div>
           </div>
         </div>
@@ -512,19 +520,16 @@
 
       <!-- Results -->
       <div class="card">
-        <h2>Tank Mix</h2>
+        <h2>Injection Tank Ratio</h2>
+        <div class="error-note" id="gh-nodat-error"></div>
         <div class="result-grid">
           <div class="result-item highlight">
-            <div class="label">Skeepon Greenhouse</div>
-            <div class="value" id="gh-out-skeepon">—<span class="small">gal</span></div>
+            <div class="label">Skeepon GH</div>
+            <div class="value" id="gh-out-skeepon">—<span class="small">gpm</span></div>
           </div>
           <div class="result-item">
             <div class="label">Water</div>
-            <div class="value" id="gh-out-water">—<span class="small">gal</span></div>
-          </div>
-          <div class="result-item highlight full-width">
-            <div class="label">Total tank volume</div>
-            <div class="value" id="gh-out-tank">—<span class="small">gal</span></div>
+            <div class="value" id="gh-out-water">—<span class="small">gpm</span></div>
           </div>
         </div>
         <div class="tank-bar">
@@ -535,6 +540,7 @@
           <span><span class="dot" style="background:#2e7d32"></span>Skeepon GH&nbsp;<strong id="gh-legend-product-pct">—</strong></span>
           <span><span class="dot" style="background:#81c784"></span>Water&nbsp;<strong id="gh-legend-water-pct">—</strong></span>
         </div>
+        <p class="gh-mix-note">Delivers 2.0% v/v Skeepon into <strong id="gh-out-total">—</strong> gpm total output</p>
         <button class="copy-btn" id="gh-copy-btn" onclick="ghCopySummary()">Copy mix summary</button>
       </div>
 
@@ -777,29 +783,43 @@
   }
 
   function ghCalculate() {
-    var tank = parseFloat(document.getElementById('gh-tank').value) || 0;
-    if (!tank) return;
-    var c       = GH_CROPS[activeGhCrop];
-    var skeepon = tank / c.dilution;
-    var water   = tank - skeepon;
-    var pct     = (skeepon / tank) * 100;
-    var barPct  = Math.max(2, Math.min(pct, 98));
+    var F = parseFloat(document.getElementById('gh-flowrate').value) || 0;
+    var I = parseFloat(document.getElementById('gh-injrate').value)  || 0;
+    if (!F || !I) return;
 
-    document.getElementById('gh-out-skeepon').innerHTML = fmtGal(skeepon) + '<span class="small"> gal</span>';
-    document.getElementById('gh-out-water').innerHTML   = fmtGal(water)   + '<span class="small"> gal</span>';
-    document.getElementById('gh-out-tank').innerHTML    = fmtGal(tank)    + '<span class="small"> gal</span>';
+    var errorEl    = document.getElementById('gh-nodat-error');
+    var skeeponGpm = 0.02 * (F + I);   // gpm of Skeepon needed for 2% v/v in total output
 
+    if (skeeponGpm > I) {
+      var minInj  = (0.02 * F) / 0.98;
+      var maxConc = (I / (F + I)) * 100;
+      errorEl.innerHTML = 'Injection rate too low for 2% v/v. Minimum needed: <strong>' +
+        fmt(minInj, 1) + ' gpm</strong>. At ' + fmt(I, 1) + ' gpm, max concentration is ' +
+        fmt(maxConc, 2) + '%.';
+      errorEl.classList.add('visible');
+      return;
+    }
+    errorEl.classList.remove('visible');
+
+    var waterGpm = I - skeeponGpm;
+    var skeePct  = (skeeponGpm / I) * 100;
+    var barPct   = Math.max(2, Math.min(skeePct, 98));
+
+    document.getElementById('gh-out-skeepon').innerHTML          = fmt(skeeponGpm, 2) + '<span class="small"> gpm</span>';
+    document.getElementById('gh-out-water').innerHTML            = fmt(waterGpm, 2)   + '<span class="small"> gpm</span>';
     document.getElementById('gh-bar-product').style.width        = barPct + '%';
-    document.getElementById('gh-legend-product-pct').textContent = fmt(pct, 1) + '%';
-    document.getElementById('gh-legend-water-pct').textContent   = fmt(100 - pct, 1) + '%';
+    document.getElementById('gh-legend-product-pct').textContent = fmt(skeePct, 1) + '%';
+    document.getElementById('gh-legend-water-pct').textContent   = fmt(100 - skeePct, 1) + '%';
+    document.getElementById('gh-out-total').textContent          = fmt(F + I, 0);
   }
 
   function ghCopySummary() {
     var c       = GH_CROPS[activeGhCrop];
-    var tank    = document.getElementById('gh-tank').value || '—';
+    var F       = document.getElementById('gh-flowrate').value || '—';
+    var I       = document.getElementById('gh-injrate').value  || '—';
     var skeepon = document.getElementById('gh-out-skeepon').textContent.replace(/[^\d.,]/g, '') || '—';
     var water   = document.getElementById('gh-out-water').textContent.replace(/[^\d.,]/g, '')   || '—';
-    var text    = 'Skeepon GH · ' + c.label + ' · ' + tank + ' gal tank → ' + skeepon + ' gal Skeepon GH + ' + water + ' gal water (1:' + c.dilution + ')';
+    var text    = 'Skeepon GH · ' + c.label + ' · ' + F + ' gpm main / ' + I + ' gpm injection → ' + skeepon + ' gpm Skeepon GH + ' + water + ' gpm water (2% v/v)';
     navigator.clipboard.writeText(text).then(function() {
       var btn = document.getElementById('gh-copy-btn');
       btn.textContent = 'Copied!';
@@ -980,7 +1000,8 @@
   document.getElementById('withinRow').addEventListener('input',  function() { refreshDensityDisplay(); fieldCalculate(); });
   document.getElementById('acres').addEventListener('input', fieldCalculate);
   document.getElementById('flowRate').addEventListener('input', fieldCalculate);
-  document.getElementById('gh-tank').addEventListener('input', ghCalculate);
+  document.getElementById('gh-flowrate').addEventListener('input', ghCalculate);
+  document.getElementById('gh-injrate').addEventListener('input', ghCalculate);
 
   /* ── Init ── */
   selectCrop('tomato');
