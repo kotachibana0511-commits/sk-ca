@@ -525,26 +525,18 @@
         </div>
       </div>
 
-      <!-- Results -->
+      <!-- Tank mix breakdown -->
       <div class="card">
-        <h2>Injection Ratio</h2>
-        <div class="result-grid">
-          <div class="result-item highlight full-width">
-            <div class="label">Greenhouse Dilution</div>
-            <div class="value">1:50</div>
-          </div>
-          <div class="result-item full-width">
-            <div class="label">Concentration</div>
-            <div class="value" id="gh-conc-out">—<span class="small">% v/v</span></div>
-          </div>
-        </div>
+        <h2>Tank Mix</h2>
 
         <!-- Pure Skeepon (conc < 2.2%) -->
-        <p class="gh-mix-note" id="gh-pure-note">Fill injection tank with <strong>pure Skeepon GH</strong>. At these flow rates the pump delivers approx. <strong>1:50 (2% v/v)</strong> Skeepon.</p>
+        <div id="gh-pure-section">
+          <p class="gh-mix-note">Fill injection tank with <strong>pure Skeepon GH</strong> — no water needed at these flow rates.</p>
+        </div>
 
         <!-- Dilution needed (conc ≥ 2.2%) -->
         <div id="gh-dilution-panel" style="display:none">
-          <p class="gh-mix-note" style="margin-bottom:14px;">Injection rate exceeds 2.2% — add water to the tank to maintain <strong>1:50 (2% v/v)</strong>:</p>
+          <p class="gh-mix-note" style="margin-bottom:14px;">Injection rate exceeds 2.2% — add water to the tank to maintain <strong>1:50</strong>:</p>
           <div class="result-grid">
             <div class="result-item highlight">
               <div class="label">Skeepon GH</div>
@@ -565,7 +557,21 @@
           </div>
           <p class="gh-mix-note" style="margin-top:12px;">Per quart of stock: <strong id="gh-dil-oz-sk">—</strong> fl oz Skeepon GH + <strong id="gh-dil-oz-w">—</strong> fl oz water</p>
         </div>
+      </div>
 
+      <!-- Injection ratio -->
+      <div class="card">
+        <h2>Injection Ratio</h2>
+        <div class="result-grid">
+          <div class="result-item highlight full-width">
+            <div class="label">Greenhouse Dilution</div>
+            <div class="value">1:50</div>
+          </div>
+          <div class="result-item full-width">
+            <div class="label">Concentration</div>
+            <div class="value">2.0<span class="small">% v/v</span></div>
+          </div>
+        </div>
         <button class="copy-btn" id="gh-copy-btn" onclick="ghCopySummary()">Copy mix summary</button>
       </div>
 
@@ -813,10 +819,8 @@
     if (!F || !I) return;
 
     var conc = (I / F) * 100;
-    document.getElementById('gh-conc-out').innerHTML = fmt(conc, 1) + '<span class="small">% v/v</span>';
-
     var needsDilution = conc >= 2.2;
-    document.getElementById('gh-pure-note').style.display      = needsDilution ? 'none'  : 'block';
+    document.getElementById('gh-pure-section').style.display   = needsDilution ? 'none'  : 'block';
     document.getElementById('gh-dilution-panel').style.display = needsDilution ? 'block' : 'none';
 
     if (needsDilution) {
